@@ -1,7 +1,8 @@
+#include <ableton/Link.hpp>
+
 extern "C" {
   #include "mongoose.h"
 }
-#include <ableton/Link.hpp>
 
 static void ev_handler(struct mg_connection *nc, int ev, void *p) {
   struct mbuf *io = &nc->recv_mbuf;
@@ -26,13 +27,19 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
 int main(void) {
   struct mg_mgr mgr;
   const char *port1 = "udp://1234", *port2 = "udp://127.0.0.1:17000";
+  ableton::Link link(120.);
 
   mg_mgr_init(&mgr, NULL);
   mg_bind(&mgr, port1, ev_handler);
   mg_bind(&mgr, port2, ev_handler);
 
-  printf("Starting echo mgr on ports %s, %s\n", port1, port2);
+  link.enable(true);
+
+  std::cout << "Starting echo mgr on ports " << port1 << ", " << port2 << std::endl;
+
   for (;;) {
+    std::cout << "Link bpm: " << link.captureAppTimeline().tempo() << "     \r" << std::flush;
+
     mg_mgr_poll(&mgr, 1000);
   }
   mg_mgr_free(&mgr);

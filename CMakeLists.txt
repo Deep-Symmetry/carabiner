@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(Carabiner)
 
-include(~/git/link/AbletonLinkConfig.cmake)
+include(link/AbletonLinkConfig.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
