@@ -49,7 +49,7 @@ static void process_message(std::string msg, struct mg_connection *nc) {
   std::string args;
   if (matches_command(msg, "bpm ", args)) {
     handle_bpm(args, nc);
-  } else if (matches_command(msg, "status ", args)) {
+  } else if (matches_command(msg, "status", args)) {
     handle_status(args, nc);
   } else {
     // Unrecognized input, report error
