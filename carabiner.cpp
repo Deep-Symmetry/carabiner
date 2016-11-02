@@ -7,18 +7,30 @@ extern "C" {
 
 ableton::Link link_instance(120.);
 
-static void handle_bpm(std::string args) {
+static void handle_status(std::string args, struct mg_connection *nc) {
+  ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
+  std::string response = "status { :peers " + std::to_string(link_instance.numPeers()) +
+    " :bpm " + std::to_string(timeline.tempo()) + " }";
+  mg_send(nc, response.data(), response.length());
+}
+
+static void handle_bpm(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   double bpm;
 
   ss >> bpm;
   if (ss.fail()) {
+    // Unparsed bpm, report error
+    std::string response = "bad_bpm " + args;
+    mg_send(nc, response.data(), response.length());
     std::cout << "Failed to parse bpm: " << args << std::endl;
   }  else {
     ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
     timeline.setTempo(bpm, link_instance.clock().micros());
     link_instance.commitAppTimeline(timeline);
-    std::cout << "Set bpm to " << bpm << std::endl;
+    std::string response = "bpm " + std::to_string(timeline.tempo());
+    mg_send(nc, response.data(), response.length());
+    std::cout << "Set bpm to " << timeline.tempo() << std::endl;
   }
 }
 
@@ -31,11 +43,18 @@ static bool matches_command(std::string msg, std::string cmd, std::string& args)
   return false;
 }
 
-static void process_message(std::string msg) {
+static void process_message(std::string msg, struct mg_connection *nc) {
   std::cout << std::endl << "received: " << msg << std::endl;
+
   std::string args;
   if (matches_command(msg, "bpm ", args)) {
-    handle_bpm(args);
+    handle_bpm(args, nc);
+  } else if (matches_command(msg, "status ", args)) {
+    handle_status(args, nc);
+  } else {
+    // Unrecognized input, report error
+    std::string response = "unsupported " + msg;
+    mg_send(nc, response.data(), response.length());
   }
 }
 
@@ -44,8 +63,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
   (void) p;
   switch (ev) {
   case MG_EV_RECV:
-    process_message(std::string(io->buf, io->len));
-    mg_send(nc, io->buf, io->len);  // Echo message back
+    process_message(std::string(io->buf, io->len), nc);
     mbuf_remove(io, io->len);       // Discard message from recv buffer
     // In case of UDP, Mongoose creates new virtual connection for
     // incoming messages
