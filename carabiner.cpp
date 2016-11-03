@@ -1,16 +1,21 @@
 #include <ableton/Link.hpp>
 #include <string>
+#include <set>
+#include <mutex>
 
 extern "C" {
 #include "mongoose.h"
 }
 
-ableton::Link link_instance(120.);
+ableton::Link linkInstance(120.);
+
+std::set<struct mg_connection *> activeConnections, updatedConnections;
+std::mutex updatedMutex;
 
 // Send a response describing the current state of the Link timeline.
 static void report_status(struct mg_connection *nc) {
-  ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
-  std::string response = "status { :peers " + std::to_string(link_instance.numPeers()) +
+  ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+  std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
     " :bpm " + std::to_string(timeline.tempo()) +
     " :start " + std::to_string(timeline.timeAtBeat(0.0, 4.0).count()) + " }";
   mg_send(nc, response.data(), response.length());
@@ -31,9 +36,9 @@ static void handle_bpm(std::string args, struct mg_connection *nc) {
     mg_send(nc, response.data(), response.length());
     std::cout << "Failed to parse bpm: " << args << std::endl;
   }  else {
-    ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
-    timeline.setTempo(bpm, link_instance.clock().micros());
-    link_instance.commitAppTimeline(timeline);
+    ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+    timeline.setTempo(bpm, linkInstance.clock().micros());
+    linkInstance.commitAppTimeline(timeline);
     report_status(nc);
   }
 }
@@ -41,9 +46,9 @@ static void handle_bpm(std::string args, struct mg_connection *nc) {
 static void handle_beat(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   // TODO: read beat number, bar size, latency values
-  ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
-  timeline.forceBeatAtTime(0.0, link_instance.clock().micros(), 4.0);
-  link_instance.commitAppTimeline(timeline);
+  ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+  timeline.forceBeatAtTime(0.0, linkInstance.clock().micros(), 4.0);
+  linkInstance.commitAppTimeline(timeline);
   report_status(nc);
 }
 
@@ -76,7 +81,28 @@ static void process_message(std::string msg, struct mg_connection *nc) {
 static void ev_handler(struct mg_connection *nc, int ev, void *p) {
   struct mbuf *io = &nc->recv_mbuf;
   (void) p;
+  bool needsUpdate;
+
   switch (ev) {
+
+  case MG_EV_ACCEPT:
+    activeConnections.insert(nc);
+    break;
+
+  case MG_EV_CLOSE:
+    activeConnections.erase(nc);
+    break;
+
+  case MG_EV_POLL:
+    updatedMutex.lock();
+    needsUpdate = updatedConnections.insert(nc).second;
+    updatedMutex.unlock();
+    if (needsUpdate) {
+      // The connection was not already on the updated list, so send it an updated status
+      report_status(nc);
+    }
+    break;
+
   case MG_EV_RECV:
     process_message(std::string(io->buf, io->len), nc);
     mbuf_remove(io, io->len);       // Discard message from recv buffer
@@ -86,27 +112,46 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     // the same address) or we can close it (this saves some memory, but
     // decreases perfomance, because it forces creation of connection
     // for every incoming dgram)
-    nc->flags |= MG_F_SEND_AND_CLOSE;
+    //nc->flags |= MG_F_SEND_AND_CLOSE;
     break;
   default:
     break;
   }
 }
 
+// Registered to be called by a Link thread whenever the session BPM changes; arranges for an update to
+// be sent to all of our TCP clients.
+void tempoCallback(double bpm) {
+  updatedMutex.lock();
+  updatedConnections.clear();
+  updatedMutex.unlock();
+}
+
+// Registered to be called by a Link thread whenever the number of peers changes; arranges for an update to
+// be sent to all of our TCP clients.
+void peersCallback(std::size_t numPeers) {
+  updatedMutex.lock();
+  updatedConnections.clear();
+  updatedMutex.unlock();
+}
+
 int main(void) {
-  link_instance.enable(true);
+  linkInstance.setTempoCallback(tempoCallback);
+  linkInstance.setNumPeersCallback(peersCallback);
+  linkInstance.enable(true);
 
   struct mg_mgr mgr;
-  const char *port1 = "udp://1234", *port2 = "udp://127.0.0.1:17000";
+  const char *port = "tcp://127.0.0.1:17000";
 
   mg_mgr_init(&mgr, NULL);
-  mg_bind(&mgr, port1, ev_handler);
-  mg_bind(&mgr, port2, ev_handler);
+  mg_bind(&mgr, port, ev_handler);
 
-  std::cout << "Starting echo mgr on ports " << port1 << ", " << port2 << std::endl;
+  std::cout << "Starting Carabiner on port " << port << std::endl;
 
   for (;;) {
-    std::cout << "Link bpm: " << link_instance.captureAppTimeline().tempo() << "     \r" << std::flush;
+    std::cout << "Link bpm: " << linkInstance.captureAppTimeline().tempo() <<
+      " Peers: " << linkInstance.numPeers() <<
+      " Connections: " << activeConnections.size() << "     \r" << std::flush;
 
     mg_mgr_poll(&mgr, 1000);
   }
