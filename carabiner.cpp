@@ -7,11 +7,17 @@ extern "C" {
 
 ableton::Link link_instance(120.);
 
-static void handle_status(std::string args, struct mg_connection *nc) {
+// Send a response describing the current state of the Link timeline.
+static void report_status(struct mg_connection *nc) {
   ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
   std::string response = "status { :peers " + std::to_string(link_instance.numPeers()) +
-    " :bpm " + std::to_string(timeline.tempo()) + " }";
+    " :bpm " + std::to_string(timeline.tempo()) +
+    " :start " + std::to_string(timeline.timeAtBeat(0.0, 4.0).count()) + " }";
   mg_send(nc, response.data(), response.length());
+}
+
+static void handle_status(std::string args, struct mg_connection *nc) {
+  report_status(nc);
 }
 
 static void handle_bpm(std::string args, struct mg_connection *nc) {
@@ -28,10 +34,17 @@ static void handle_bpm(std::string args, struct mg_connection *nc) {
     ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
     timeline.setTempo(bpm, link_instance.clock().micros());
     link_instance.commitAppTimeline(timeline);
-    std::string response = "bpm " + std::to_string(timeline.tempo());
-    mg_send(nc, response.data(), response.length());
-    std::cout << "Set bpm to " << timeline.tempo() << std::endl;
+    report_status(nc);
   }
+}
+
+static void handle_beat(std::string args, struct mg_connection *nc) {
+  std::stringstream ss(args);
+  // TODO: read beat number, bar size, latency values
+  ableton::Link::Timeline timeline = link_instance.captureAppTimeline();
+  timeline.forceBeatAtTime(0.0, link_instance.clock().micros(), 4.0);
+  link_instance.commitAppTimeline(timeline);
+  report_status(nc);
 }
 
 static bool matches_command(std::string msg, std::string cmd, std::string& args) {
@@ -49,6 +62,8 @@ static void process_message(std::string msg, struct mg_connection *nc) {
   std::string args;
   if (matches_command(msg, "bpm ", args)) {
     handle_bpm(args, nc);
+  } else if (matches_command(msg, "beat ", args)) {
+    handle_beat(args, nc);
   } else if (matches_command(msg, "status", args)) {
     handle_status(args, nc);
   } else {
