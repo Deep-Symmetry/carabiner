@@ -106,13 +106,6 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
   case MG_EV_RECV:
     process_message(std::string(io->buf, io->len), nc);
     mbuf_remove(io, io->len);       // Discard message from recv buffer
-    // In case of UDP, Mongoose creates new virtual connection for
-    // incoming messages
-    // We can keep it (and it will be reused for another messages from
-    // the same address) or we can close it (this saves some memory, but
-    // decreases perfomance, because it forces creation of connection
-    // for every incoming dgram)
-    //nc->flags |= MG_F_SEND_AND_CLOSE;
     break;
   default:
     break;
@@ -153,7 +146,7 @@ int main(void) {
       " Peers: " << linkInstance.numPeers() <<
       " Connections: " << activeConnections.size() << "     \r" << std::flush;
 
-    mg_mgr_poll(&mgr, 1000);
+    mg_mgr_poll(&mgr, 20);
   }
   mg_mgr_free(&mgr);
 
