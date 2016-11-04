@@ -1,3 +1,6 @@
 [submodule "link"]
 	path = link
 	url = https://github.com/Ableton/link.git
+[submodule "gflags"]
+	path = gflags
+	url = https://github.com/gflags/gflags.git

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(Carabiner)
 
 include(link/AbletonLinkConfig.cmake)
+add_subdirectory(gflags)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -19,5 +20,5 @@ add_executable(Carabiner
   carabiner.cpp
 )
 
-target_link_libraries(Carabiner Ableton::Link)
+target_link_libraries(Carabiner Ableton::Link gflags)
 

@@ -8,10 +8,10 @@ process fixed.
 
 ## Building
 
-Carabiner relies on `link` as a `git` submodule (and that relies on
-its own submodules), so after you have cloned the main `carabiner`
-repository, you need to `cd` into it and set up the submodules by
-running:
+Carabiner relies on `link` and `gflags` as `git` submodules (and link
+relies on its own submodules), so after you have cloned the main
+`carabiner` repository, you need to `cd` into it and set up the
+submodules by running:
 
     git submodule update --init --recursive
 
@@ -49,3 +49,6 @@ along with this program. If not, see
 While available through the same GPL v2 as Carabiner itself, they are
 also available through proprietary licenses for embedding in non-free
 software, by contacting their respective developers.
+
+[gflags](https://github.com/gflags/gflags) is Copyright © 2006, Google
+Inc. It has its own [license](GFLAGS_LICENSE.txt).

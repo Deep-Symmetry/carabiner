@@ -1,14 +1,42 @@
-#include <ableton/Link.hpp>
 #include <string>
 #include <set>
 #include <mutex>
+
+#include <gflags/gflags.h>
+
+#include <ableton/Link.hpp>
 
 extern "C" {
 #include "mongoose.h"
 }
 
+// Validators for command-line arguments
+static bool validatePort(const char* flagname, gflags::int32 value) {
+  if (value > 0 && value < 32768) {
+    return true;  // Valid
+  }
+  std::cerr << flagname << " must be between 1 and 32767" << std::endl;
+  return false;
+}
+
+static bool validatePoll(const char* flagname, gflags::int32 value) {
+  if (value > 0 && value < 1001) {
+    return true;  // Valid
+  }
+  std::cerr << flagname << " must be between 1 and 1000" << std::endl;
+  return false;
+}
+
+// Set up the command-line options supported by the program
+DEFINE_int32(port, 17000, "TCP port on which to accept connections");
+static const bool port_dummy = gflags::RegisterFlagValidator(&FLAGS_port, &validatePort);
+DEFINE_int32(poll, 20, "Number of milliseconds between updates");
+static const bool poll_dummy = gflags::RegisterFlagValidator(&FLAGS_poll, &validatePoll);
+
+// Our interface to the Link session
 ableton::Link linkInstance(120.);
 
+// Keep track of our open connections, and those which need updates sent to them
 std::set<struct mg_connection *> activeConnections, updatedConnections;
 std::mutex updatedMutex;
 
@@ -128,13 +156,22 @@ void peersCallback(std::size_t numPeers) {
   updatedMutex.unlock();
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
+  gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
+                          " --port 1234 --poll 10");
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  if (argc > 1) {
+    std::cerr << "Unrecognized argument, " << argv[1] << std::endl;
+    gflags::ShowUsageWithFlagsRestrict(argv[0], "carabiner.cpp");
+    return 1;
+  }
+
   linkInstance.setTempoCallback(tempoCallback);
   linkInstance.setNumPeersCallback(peersCallback);
   linkInstance.enable(true);
 
   struct mg_mgr mgr;
-  const char *port = "tcp://127.0.0.1:17000";
+  const char *port = ("tcp://127.0.0.1:" + std::to_string(FLAGS_port)).c_str();
 
   mg_mgr_init(&mgr, NULL);
   mg_bind(&mgr, port, ev_handler);
@@ -146,7 +183,7 @@ int main(void) {
       " Peers: " << linkInstance.numPeers() <<
       " Connections: " << activeConnections.size() << "     \r" << std::flush;
 
-    mg_mgr_poll(&mgr, 20);
+    mg_mgr_poll(&mgr, FLAGS_poll);
   }
   mg_mgr_free(&mgr);
 
