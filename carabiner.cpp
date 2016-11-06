@@ -36,12 +36,12 @@ static const bool poll_dummy = gflags::RegisterFlagValidator(&FLAGS_poll, &valid
 // Our interface to the Link session
 ableton::Link linkInstance(120.);
 
-// Keep track of our open connections, and those which need updates sent to them
+// Keep track of open TCP connections, and those which need updates sent to them
 std::set<struct mg_connection *> activeConnections, updatedConnections;
 std::mutex updatedMutex;
 
-// Send a response describing the current state of the Link timeline.
-static void report_status(struct mg_connection *nc) {
+// Send a message describing the current state of the Link session.
+static void reportStatus(struct mg_connection *nc) {
   ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
   std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
     " :bpm " + std::to_string(timeline.tempo()) +
@@ -49,38 +49,99 @@ static void report_status(struct mg_connection *nc) {
   mg_send(nc, response.data(), response.length());
 }
 
-static void handle_status(std::string args, struct mg_connection *nc) {
-  report_status(nc);
+// Process a request for the current link session status. Can simply remove the connection
+// from the set of those which have current status updates, and one will be sent on the next
+// poll.
+static void handleStatus(std::string args, struct mg_connection *nc) {
+  updatedMutex.lock();
+  updatedConnections.erase(nc);
+  updatedMutex.unlock();
 }
 
-static void handle_bpm(std::string args, struct mg_connection *nc) {
+// Process a request to establish a specific tempo
+static void handleBpm(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   double bpm;
 
   ss >> bpm;
-  if (ss.fail()) {
+  if (ss.fail() || (bpm < 0.9) || (bpm > 400.0)) {
     // Unparsed bpm, report error
-    std::string response = "bad_bpm " + args;
+    std::string response = "bad-bpm " + args;
     mg_send(nc, response.data(), response.length());
     std::cout << "Failed to parse bpm: " << args << std::endl;
   }  else {
     ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
     timeline.setTempo(bpm, linkInstance.clock().micros());
     linkInstance.commitAppTimeline(timeline);
-    report_status(nc);
+    // No neeed to call reportStatus(nc) because if the BPM changed that will happen on its own.
   }
 }
 
-static void handle_beat(std::string args, struct mg_connection *nc) {
+// Process a request to query the timeline
+static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
-  // TODO: read beat number, bar size, latency values
-  ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-  timeline.forceBeatAtTime(0.0, linkInstance.clock().micros(), 4.0);
-  linkInstance.commitAppTimeline(timeline);
-  report_status(nc);
+  long when;
+  double quantum;
+
+  ss >> when;
+  if (ss.fail()) {
+    // Unparsed microsecond value, report error
+    std::string response = "bad-time " + args;
+    mg_send(nc, response.data(), response.length());
+  } else {
+    ss >> quantum;
+    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      // Unparsed quantum value, report error
+      std::string response = "bad-quantum " + args;
+      mg_send(nc, response.data(), response.length());
+    } else {
+      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+      double beat = timeline.beatAtTime(std::chrono::microseconds(when), quantum);
+      std::string response = "beat-at-time { :when " + std::to_string(when) +
+        " :quantum " + std::to_string(quantum) +
+        " :beat " + std::to_string(beat) + " }";
+      mg_send(nc, response.data(), response.length());
+    }
+  }
 }
 
-static bool matches_command(std::string msg, std::string cmd, std::string& args) {
+// Process a request to realign the timeline
+static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
+  std::stringstream ss(args);
+  double beat;
+  long when;
+  double quantum;
+
+  ss >> beat;
+  if (ss.fail()) {
+    // Unparsed beat value, report error
+    std::string response = "bad_beat " + args;
+    mg_send(nc, response.data(), response.length());
+  } else {
+    ss >> when;
+    if (ss.fail()) {
+      // Unparsed microsecond value, report error
+      std::string response = "bad_time " + args;
+      mg_send(nc, response.data(), response.length());
+    } else {
+      ss >> quantum;
+      if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+        // Unparsed quantum value, report error
+        std::string response = "bad_quantum " + args;
+        mg_send(nc, response.data(), response.length());
+      } else {
+        ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+        timeline.forceBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+        linkInstance.commitAppTimeline(timeline);
+        reportStatus(nc);
+      }
+    }
+  }
+}
+
+// Check whether the packet contains the specified command; if so, remove the
+// command prefix from the arguments.
+static bool matchesCommand(std::string msg, std::string cmd, std::string& args) {
   if (msg.substr(0, cmd.length()) == cmd) {
     std::cout << "  is " << cmd << "command!" << std::endl;
     args = msg.substr(cmd.length(), std::string::npos);
@@ -89,16 +150,19 @@ static bool matches_command(std::string msg, std::string cmd, std::string& args)
   return false;
 }
 
-static void process_message(std::string msg, struct mg_connection *nc) {
+// When a packet has been received, identify the command it contains, and handle it appropriately.
+static void processMessage(std::string msg, struct mg_connection *nc) {
   std::cout << std::endl << "received: " << msg << std::endl;
 
   std::string args;
-  if (matches_command(msg, "bpm ", args)) {
-    handle_bpm(args, nc);
-  } else if (matches_command(msg, "beat ", args)) {
-    handle_beat(args, nc);
-  } else if (matches_command(msg, "status", args)) {
-    handle_status(args, nc);
+  if (matchesCommand(msg, "bpm ", args)) {
+    handleBpm(args, nc);
+  } else if (matchesCommand(msg, "beat-at-time ", args)) {
+    handleBeatAtTime(args, nc);
+  } else if (matchesCommand(msg, "force-beat-at-time ", args)) {
+    handleForceBeatAtTime(args, nc);
+  } else if (matchesCommand(msg, "status", args)) {
+    handleStatus(args, nc);
   } else {
     // Unrecognized input, report error
     std::string response = "unsupported " + msg;
@@ -106,7 +170,7 @@ static void process_message(std::string msg, struct mg_connection *nc) {
   }
 }
 
-static void ev_handler(struct mg_connection *nc, int ev, void *p) {
+static void eventHandler(struct mg_connection *nc, int ev, void *p) {
   struct mbuf *io = &nc->recv_mbuf;
   (void) p;
   bool needsUpdate;
@@ -127,12 +191,12 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p) {
     updatedMutex.unlock();
     if (needsUpdate) {
       // The connection was not already on the updated list, so send it an updated status
-      report_status(nc);
+      reportStatus(nc);
     }
     break;
 
   case MG_EV_RECV:
-    process_message(std::string(io->buf, io->len), nc);
+    processMessage(std::string(io->buf, io->len), nc);
     mbuf_remove(io, io->len);       // Discard message from recv buffer
     break;
   default:
@@ -174,7 +238,7 @@ int main(int argc, char* argv[]) {
   const char *port = ("tcp://127.0.0.1:" + std::to_string(FLAGS_port)).c_str();
 
   mg_mgr_init(&mgr, NULL);
-  mg_bind(&mgr, port, ev_handler);
+  mg_bind(&mgr, port, eventHandler);
 
   std::cout << "Starting Carabiner on port " << port << std::endl;
 
