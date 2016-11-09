@@ -21,8 +21,8 @@ not written using C++ compatible languages and runtimes.
 ## Usage
 
 If you are on a Mac OS X system, you can download the executable from
-the [releases](releases) page. Then just open a terminal window, and
-run it:
+the [releases](https://github.com/brunchboy/carabiner/releases) page.
+Then just open a terminal window, and run it:
 
     > Carabiner
     Starting Carabiner on port tcp://127.0.0.1:17000
@@ -160,8 +160,8 @@ jitter does not lead to excessive adjustments.
 > If you are building an application that can perform quantized
 > starts, and thereby participate in a Link session more graciously,
 > without requiring the other participants to shift the timeline, then
-> open an [issue](issues) to have the `request-beat-at-time` command
-> implemented by Carabiner.
+> open an [issue](https://github.com/brunchboy/carabiner/issues) to
+> have the `request-beat-at-time` command implemented by Carabiner.
 
 ## Licenses
 
