@@ -1,6 +1,6 @@
 # Carabiner
 
-<image align="right" width="300" src="doc/assets/carabiner.jpg">
+<image align="right" width="150" src="doc/assets/carabiner.jpg">
 
 A loose connector for interacting with
 [Ableton Link](https://www.ableton.com/en/link/).
