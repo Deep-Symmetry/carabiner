@@ -143,7 +143,7 @@ static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
 // command prefix from the arguments.
 static bool matchesCommand(std::string msg, std::string cmd, std::string& args) {
   if (msg.substr(0, cmd.length()) == cmd) {
-    std::cout << "  is " << cmd << "command!" << std::endl;
+    //std::cout << "  is " << cmd << "command!" << std::endl;
     args = msg.substr(cmd.length(), std::string::npos);
     return true;
   }
@@ -152,7 +152,7 @@ static bool matchesCommand(std::string msg, std::string cmd, std::string& args) 
 
 // When a packet has been received, identify the command it contains, and handle it appropriately.
 static void processMessage(std::string msg, struct mg_connection *nc) {
-  std::cout << std::endl << "received: " << msg << std::endl;
+  //std::cout << std::endl << "received: " << msg << std::endl;
 
   std::string args;
   if (matchesCommand(msg, "bpm ", args)) {
