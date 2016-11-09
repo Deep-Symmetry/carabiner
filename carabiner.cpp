@@ -68,7 +68,7 @@ static void handleBpm(std::string args, struct mg_connection *nc) {
     // Unparsed bpm, report error
     std::string response = "bad-bpm " + args;
     mg_send(nc, response.data(), response.length());
-    std::cout << "Failed to parse bpm: " << args << std::endl;
+    std::cerr << "Failed to parse bpm: " << args << std::endl;
   }  else {
     ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
     timeline.setTempo(bpm, linkInstance.clock().micros());
