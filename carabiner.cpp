@@ -223,6 +223,7 @@ void peersCallback(std::size_t numPeers) {
 int main(int argc, char* argv[]) {
   gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
                           " --port 1234 --poll 10");
+  gflags::SetVersionString("0.1.0");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   if (argc > 1) {
     std::cerr << "Unrecognized argument, " << argv[1] << std::endl;
