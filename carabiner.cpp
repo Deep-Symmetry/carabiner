@@ -115,19 +115,19 @@ static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
   ss >> beat;
   if (ss.fail()) {
     // Unparsed beat value, report error
-    std::string response = "bad_beat " + args;
+    std::string response = "bad-beat " + args;
     mg_send(nc, response.data(), response.length());
   } else {
     ss >> when;
     if (ss.fail()) {
       // Unparsed microsecond value, report error
-      std::string response = "bad_time " + args;
+      std::string response = "bad-time " + args;
       mg_send(nc, response.data(), response.length());
     } else {
       ss >> quantum;
       if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
         // Unparsed quantum value, report error
-        std::string response = "bad_quantum " + args;
+        std::string response = "bad-quantum " + args;
         mg_send(nc, response.data(), response.length());
       } else {
         ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
