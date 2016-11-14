@@ -91,7 +91,7 @@ whenever the number of Link peers changes.
 ### bpm
 
 Sending the string `bpm ` followed by a floating-point value, for
-example `bpm 140.0`, tells Carabiner to immediately change the Link
+example `bpm 140.0`, tells Carabiner to immediately set the Link
 session's tempo to the specified value. If this is a change from the
 previous value, it will result in a `status` response as described
 above.
