@@ -42,10 +42,12 @@ std::mutex updatedMutex;
 
 // Send a message describing the current state of the Link session.
 static void reportStatus(struct mg_connection *nc) {
-  ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+  const std::chrono::microseconds time = linkInstance.clock().micros();
+  const ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
   std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
     " :bpm " + std::to_string(timeline.tempo()) +
-    " :start " + std::to_string(timeline.timeAtBeat(0.0, 4.0).count()) + " }";
+    " :start " + std::to_string(timeline.timeAtBeat(0.0, 4.0).count()) +
+    " :beat " + std::to_string(timeline.beatAtTime(time, 4.0)) + " }";
   mg_send(nc, response.data(), response.length());
 }
 
@@ -223,7 +225,7 @@ void peersCallback(std::size_t numPeers) {
 int main(int argc, char* argv[]) {
   gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
                           " --port 1234 --poll 10");
-  gflags::SetVersionString("0.1.0");
+  gflags::SetVersionString("0.1.1");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   if (argc > 1) {
     std::cerr << "Unrecognized argument, " << argv[1] << std::endl;

@@ -6,7 +6,9 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+### Added
+
+- Beat position information in status updates, for Afterglow.
 
 ## 0.1.0 - 2016-11-09
 

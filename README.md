@@ -75,14 +75,14 @@ simple single-packet messages. The currently supported messages are:
 Sending the string `status` to Carabiner requests an update containing
 the current status. It will respond with a packet like the following:
 
-    status { :peers 1 :bpm 128.500019 :start 128928334480 }
+    status { :peers 1 :bpm 128.500019 :start 128928334480 :beat 106.412459 }
 
 As with all non-error messages from Carabiner, this consists of a
 message type identifier followed by an
 [edn](https://github.com/edn-format/edn#edn) structure containing the
 message parameters. In this case, it identifies the current number of
-Link peers, the current tempo of the Link session, and the timestamp
-of when the session timeline started.
+Link peers, the current tempo of the Link session, the timestamp
+of when the session timeline started, and the current beat position.
 
 A status response will also be sent when you first connect to
 Carabiner, and whenever the Link session tempo changes, as well as
@@ -162,6 +162,13 @@ jitter does not lead to excessive adjustments.
 > without requiring the other participants to shift the timeline, then
 > open an [issue](https://github.com/brunchboy/carabiner/issues) to
 > have the `request-beat-at-time` command implemented by Carabiner.
+
+## Apology
+
+I am not a C++ programmer; the last time I wrote anyting in it before
+Carabiner was in the early 1990s. This seems to work, but I am sure it
+could be written much better. Suggestions for improvement are
+definitely welcome!
 
 ## Licenses
 
