@@ -140,7 +140,7 @@ specified moment (which previously was 28% of the way to the third
 beat). Carabiner responds with a `status` message which reports the
 new `:start` timestamp of the timeline.
 
-    status { :peers 1 :bpm 140.000000 :start 129426471429 }
+    status { :peers 1 :bpm 140.000000 :start 129426471429 115.286846 }
 
 At this point, repeating the `beat-at-time` command from the previous
 section will return a beat value that is very close to 1.0.
