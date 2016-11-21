@@ -97,9 +97,14 @@ previous value, it will result in a `status` response as described
 above.
 
 If the bpm value is missing, cannot be parsed as a floating point
-number, or is outside the range from 0.9 to 400.0, the session tempo
+number, or is outside the range from 20.0 to 999.0, the session tempo
 is left unchanged and Carabiner responds with the message `bad-bpm `
 followed by the argument you supplied.
+
+> If your client wants to use a tempo outside the range supported by
+> Link, Ableton recommends setting the Link tempo to the closest
+> multiple or fraction which is in range. For example, if the user
+> wants 15 BPM, set the session tempo to 30 BPM.
 
 ### beat-at-time
 

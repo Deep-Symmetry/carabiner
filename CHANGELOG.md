@@ -10,6 +10,11 @@ This change log follows the conventions of
 
 - Beat position information in status updates, for Afterglow.
 
+### Fixed
+
+- Support the actual tempo range that Link itself supports, from 20 to
+  999 BPM.
+
 ## 0.1.0 - 2016-11-09
 
 ### Added

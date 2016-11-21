@@ -66,7 +66,7 @@ static void handleBpm(std::string args, struct mg_connection *nc) {
   double bpm;
 
   ss >> bpm;
-  if (ss.fail() || (bpm < 0.9) || (bpm > 400.0)) {
+  if (ss.fail() || (bpm < 20.0) || (bpm > 999.0)) {
     // Unparsed bpm, report error
     std::string response = "bad-bpm " + args;
     mg_send(nc, response.data(), response.length());
