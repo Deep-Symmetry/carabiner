@@ -6,6 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## 0.1.1 - 2016-11-20
+
 ### Added
 
 - Beat position information in status updates, for Afterglow.
@@ -24,5 +28,5 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.0...HEAD
-
+[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.0...v0.1.1
