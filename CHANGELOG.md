@@ -12,7 +12,8 @@ Nothing so far.
 
 ### Changed
 
-- Updated the embedded Link library to incorporate recent improvements.
+- Updated the embedded Link library to incorporate recent
+  improvements, such as supporting Carabiner on the Raspberry Pi.
 
 ## 0.1.1 - 2016-11-20
 
