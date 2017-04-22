@@ -8,6 +8,12 @@ This change log follows the conventions of
 
 Nothing so far.
 
+## 0.1.2 - 2017-04-22
+
+### Changed
+
+- Updated the embedded Link library to incorporate recent improvements.
+
 ## 0.1.1 - 2016-11-20
 
 ### Added
@@ -28,5 +34,6 @@ Nothing so far.
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.1...HEAD
+[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.0...v0.1.1
