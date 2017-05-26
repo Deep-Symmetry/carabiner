@@ -178,6 +178,7 @@ definitely welcome!
 ## Licenses
 
 <img align="right" alt="Deep Symmetry" src="doc/assets/DS-logo-bw-200-padded-left.png">
+
 Carabiner is Copyright © 2016 [Deep Symmetry, LLC](http://deepsymmetry.org)
 
 This program is free software: you can redistribute it and/or modify
