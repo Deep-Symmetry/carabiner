@@ -8,7 +8,7 @@ This change log follows the conventions of
 
 Nothing so far.
 
-## 0.1.3 - 2017-07-23
+## [0.1.3] - 2017-07-23
 
 ### Added
 
@@ -21,14 +21,14 @@ Nothing so far.
 - Improved some details in the documentation.
 - Updated the embedded Link library to incorporate fixes.
 
-## 0.1.2 - 2017-04-22
+## [0.1.2] - 2017-04-22
 
 ### Changed
 
 - Updated the embedded Link library to incorporate recent
   improvements, such as supporting Carabiner on the Raspberry Pi.
 
-## 0.1.1 - 2016-11-20
+## [0.1.1] - 2016-11-20
 
 ### Added
 
@@ -48,7 +48,7 @@ Nothing so far.
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.3...HEAD
-[0.1.3]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.0...v0.1.1
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/brunchboy/carabiner/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/brunchboy/carabiner/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/brunchboy/carabiner/compare/v0.1.0...v0.1.1
