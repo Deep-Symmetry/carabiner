@@ -107,6 +107,34 @@ static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
   }
 }
 
+// Process a request to query the current timeline phase
+static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
+  std::stringstream ss(args);
+  long when;
+  double quantum;
+
+  ss >> when;
+  if (ss.fail()) {
+    // Unparsed microsecond value, report error
+    std::string response = "bad-time " + args;
+    mg_send(nc, response.data(), response.length());
+  } else {
+    ss >> quantum;
+    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      // Unparsed quantum value, report error
+      std::string response = "bad-quantum " + args;
+      mg_send(nc, response.data(), response.length());
+    } else {
+      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+      double phase = timeline.phaseAtTime(std::chrono::microseconds(when), quantum);
+      std::string response = "phase-at-time { :when " + std::to_string(when) +
+        " :quantum " + std::to_string(quantum) +
+        " :phase " + std::to_string(phase) + " }";
+      mg_send(nc, response.data(), response.length());
+    }
+  }
+}
+
 // Process a request to realign the timeline
 static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
@@ -161,6 +189,8 @@ static void processMessage(std::string msg, struct mg_connection *nc) {
     handleBpm(args, nc);
   } else if (matchesCommand(msg, "beat-at-time ", args)) {
     handleBeatAtTime(args, nc);
+  } else if (matchesCommand(msg, "phase-at-time ", args)) {
+    handlePhaseAtTime(args, nc);
   } else if (matchesCommand(msg, "force-beat-at-time ", args)) {
     handleForceBeatAtTime(args, nc);
   } else if (matchesCommand(msg, "status", args)) {

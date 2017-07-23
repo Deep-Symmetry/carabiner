@@ -6,7 +6,8 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+- Updated the embedded Link library to incorporate fixes.
+- Added phase-at-time command, to implement more of the Link API.
 
 ## 0.1.2 - 2017-04-22
 
