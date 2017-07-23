@@ -10,9 +10,16 @@ Nothing so far.
 
 ## 0.1.3 - 2017-07-23
 
+### Added
+
+- Implemented the `phase-at-time`, `time-at-beat`, and `request-beat-at-time`
+  commands, to provide access to the rest of the Link API.
+- Explained the nature of Link timestamps in the documentation.
+
+### Changed
+
+- Improved some details in the documentation.
 - Updated the embedded Link library to incorporate fixes.
-- Added `phase-at-time`, `time-at-beat`, and `request-beat-at-time`
-  commands, to implement the rest of the Link API.
 
 ## 0.1.2 - 2017-04-22
 
