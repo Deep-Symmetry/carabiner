@@ -75,7 +75,7 @@ simple single-packet messages. The currently supported messages are:
 Sending the string `status` to Carabiner requests an update containing
 the current status. It will respond with a packet like the following:
 
-    status { :peers 1 :bpm 128.500019 :start 128928334480 :beat 106.412459 }
+    status { :peers 0 :bpm 120.000000 :start 73743731220 :beat 597.737570 }
 
 As with all non-error messages from Carabiner, this consists of a
 message type identifier followed by an
@@ -87,6 +87,18 @@ of when the session timeline started, and the current beat position.
 A status response will also be sent when you first connect to
 Carabiner, and whenever the Link session tempo changes, as well as
 whenever the number of Link peers changes.
+
+> :stopwatch: **About Link Timestamps:** The `:start` value in the
+> above message, and the time and `:when` values sent and returned in
+> the commands below, are expressed in microseconds, but they are
+> *not* interchangeable with values returned by the normal "wall
+> clock" system clock you use to determine the current time of day.
+> Link needs to use a monotonically increasing clock that is not
+> affected by things like leap seconds or NTP server synchronization.
+> In Java you can obtain Link-compatible timestamps using the
+> `System.nanoTime()` method. If you are working in other languages,
+> you will need to experiment in order to find out how to read the
+> same clock that Link is using.
 
 ### bpm
 
@@ -108,30 +120,91 @@ followed by the argument you supplied.
 
 ### beat-at-time
 
-Sending the string `beat-at-time ` followed by a nanosecond timestamp
+Sending the string `beat-at-time ` followed by a microsecond timestamp
 (an integer relative to the `:start` value returned in the `status`
 response), and a quantum value (which identifies the number of beats
 that make up a bar or loop as described in the Phase Synchronization
 section of the [Link documentation](http://ableton.github.io/link/)),
 asks Carabiner to identify the beat which falls at the specified point
 on the Link session timeline. For example, sending `beat-at-time
-129426900000 4` to the link session used in the above examples
-would result in a response like the following:
+73746356220 4` to the link session used in the above examples would
+result in a response like the following:
 
-    beat-at-time { :when 129426900000 :quantum 4.000000 :beat 1.278066 }
+    beat-at-time { :when 73746356220 :quantum 4.000000 :beat 5.250000 }
 
-This response indicates that at the specified nanosecond along the
-Link session timeline, we are just over a quarter of the way from the
-second to the third beat.
+This response indicates that at the specified microsecond along the
+Link session timeline, we are a quarter of the way from the sixth to
+the seventh beat (Link numbers beats starting with 0).
 
 If one of the parameters is missing or cannot be parsed, Carabiner
 responds with `bad-time ` or `bad-quantum ` followed by the arguments
 you gave it.
 
+### phase-at-time
+
+Sending the string `phase-at-time ` followed by a microsecond
+timestamp (an integer relative to the `:start` value returned in the
+`status` response), and a quantum value (which identifies the number
+of beats that make up a bar or loop as described in the Phase
+Synchronization section of
+the [Link documentation](http://ableton.github.io/link/)), asks
+Carabiner to identify the phase which falls at the specified point on
+the Link session timeline. A phase is a floating point value ranging
+fom 0.0 to just less than the quantum. For example, sending
+`phase-at-time 73746356220 4` to the link session used in the above
+examples would result in a response like the following:
+
+    phase-at-time { :when 73746356220 :quantum 4.000000 :phase 1.250000 }
+
+This response indicates that at the specified microsecond along the
+Link session timeline, we are just over a quarter of the way from the
+second to the third beat of the four beats in a quantum period.
+
+If one of the parameters is missing or cannot be parsed, Carabiner
+responds with `bad-time ` or `bad-quantum ` followed by the arguments
+you gave it.
+
+### time-at-beat
+
+Sending the string `time-at-beat ` followed by a beat number (a
+floating point value, since you can inquire about points that fall
+between beats), and a quantum value (which identifies the number of
+beats that make up a bar or loop as described in the Phase
+Synchronization section of
+the [Link documentation](http://ableton.github.io/link/)), asks
+Carabiner to return the microsecond timestamp (an integer relative to
+the `:start` value returned in the `status` response) at which the
+specified beat (or fraction of a beat) falls on the Link session
+timeline. For example, sending `time-at-beat 100 4` to the link
+session used in the above examples would result in a response like the
+following:
+
+    time-at-beat { :beat 100.000000 :quantum 4.000000 :when 73793731220 }
+
+This response indicates that the hundred and first beat falls at the
+specified microsecond within the timeline. As a sanity check, you can
+ask about the first beat, and verify that the `:when` value matches
+the `:start` value reported by the `status` message. Sending
+`time-at-beat 0 4` in the session used in these examples results in
+the following response, which you can compare to the `status` response
+above:
+
+    time-at-beat { :beat 0.000000 :quantum 4.000000 :when 73743731220 }
+
+Sending another `status` command now shows that the current beat has
+moved on while these examples were being written, but the timeline
+start point has remained the same:
+
+    status { :peers 0 :bpm 120.000000 :start 73743731220 :beat 2560.623742 }
+
+If one of the parameters is missing or cannot be parsed, Carabiner
+responds with `bad-beat ` or `bad-quantum ` followed by the arguments
+you gave it.
+
 ### force-beat-at-time
 
 Sending the string `force-beat-at-time ` followed by a floating-point
-beat number, a nanosecond timestamp (an integer relative to the
+beat number, a microsecond timestamp (an integer relative to the
 `:start` value returned in the `status` response), and a quantum value
 (as described above) tells Carabiner to forcibly and abruptly adjust
 the Link session timeline so that the specified beat falls at the
@@ -139,18 +212,20 @@ specified point in time. The change will be communicated to all
 participants, and will result in audible shifts in playback.
 
 Continuing the previous example, sending `force-beat-at-time 1.0
-129426900000 4` will tell Carabiner to adjust the Link session
-timeline so the second beat starts as close as possible to the
-specified moment (which previously was 28% of the way to the third
+73746356220 4` will tell Carabiner to adjust the Link session timeline
+so the second beat starts as close as possible to the specified moment
+(which previously was 25% of the way from the sixth to the seventh
 beat). Carabiner responds with a `status` message which reports the
 new `:start` timestamp of the timeline.
 
-    status { :peers 1 :bpm 140.000000 :start 129426471429 :beat 115.286846 }
+    status { :peers 0 :bpm 120.000000 :start 73745856220 :beat 2989.161370 }
 
-At this point, repeating the `beat-at-time` command from the previous
-section will return a beat value that is very close to 1.0.
+At this point, repeating the `beat-at-time` command we used in the
+section explaining that command, `beat-at-time 73746356220 4`, will
+return a beat value that is very close to 1.0 (in this example it was
+exact):
 
-    beat-at-time { :when 129426900000 :quantum 4.000000 :beat 0.999984 }
+    beat-at-time { :when 73746356220 :quantum 4.000000 :beat 1.000000 }
 
 If one of the parameters is missing or cannot be parsed, Carabiner
 responds with `bad-beat `, `bad-time `, or `bad-quantum ` followed by
@@ -164,9 +239,37 @@ jitter does not lead to excessive adjustments.
 
 > If you are building an application that can perform quantized
 > starts, and thereby participate in a Link session more graciously,
-> without requiring the other participants to shift the timeline, then
-> open an [issue](https://github.com/brunchboy/carabiner/issues) to
-> have the `request-beat-at-time` command implemented by Carabiner.
+> without requiring the other participants to shift the timeline, you
+> should use the following command instead:
+
+### request-beat-at-time
+
+Sending the string `request-beat-at-time ` followed by a
+floating-point beat number, a microsecond timestamp (an integer
+relative to the `:start` value returned in the `status` response), and
+a quantum value (as described above) tells Carabiner to ask Link to
+try to gracefully adjust its timeline so that the specified beat will
+occur at the specified time. If there are no other peers in the Link
+session, this will behave the same as `force-beat-at-time`, above.
+However, if there are any peers, it will avoid the kinds of audible
+discontinuities described above, by adjusting the local timeline so
+that the specified beat will instead fall at the next point in time
+*after* the requested time which has the same *phase* as the specified
+beat.
+
+Carabiner responds with a `status` message which reports the
+new `:start` timestamp of the timeline.
+
+If one of the parameters is missing or cannot be parsed, Carabiner
+responds with `bad-beat `, `bad-time `, or `bad-quantum ` followed by
+the arguments you gave it.
+
+As the Link documentation explains, this command is specifically
+designed to enable the concept of "quantized launch". If there are no
+peers, the deisred mapping is established immediately when requested.
+Otherwise, we wait until the next time at which the session phase
+matches the desired event, so we can seamlessly join the peers that
+are already in the session.
 
 ## Apology
 
@@ -179,7 +282,7 @@ definitely welcome!
 
 <img align="right" alt="Deep Symmetry" src="doc/assets/DS-logo-bw-200-padded-left.png">
 
-Carabiner is Copyright © 2016 [Deep Symmetry, LLC](http://deepsymmetry.org)
+Carabiner is Copyright © 2016-2017 [Deep Symmetry, LLC](http://deepsymmetry.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

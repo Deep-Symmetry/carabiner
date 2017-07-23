@@ -6,8 +6,13 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## 0.1.3 - 2017-07-23
+
 - Updated the embedded Link library to incorporate fixes.
-- Added phase-at-time command, to implement more of the Link API.
+- Added `phase-at-time`, `time-at-beat`, and `request-beat-at-time`
+  commands, to implement the rest of the Link API.
 
 ## 0.1.2 - 2017-04-22
 
@@ -36,6 +41,7 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.2...HEAD
+[unreleased]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/brunchboy/beat-link-trigger/compare/v0.1.0...v0.1.1

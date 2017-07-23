@@ -135,8 +135,37 @@ static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
   }
 }
 
-// Process a request to realign the timeline
-static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
+// Process a request to determine when a specific beat falls on the timeline
+static void handleTimeAtBeat(std::string args, struct mg_connection *nc) {
+  std::stringstream ss(args);
+  double beat;
+  double quantum;
+
+  ss >> beat;
+  if (ss.fail()) {
+    // Unparsed beat value, report error
+    std::string response = "bad-beat " + args;
+    mg_send(nc, response.data(), response.length());
+  } else {
+    ss >> quantum;
+    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      // Unparsed quantum value, report error
+      std::string response = "bad-quantum " + args;
+      mg_send(nc, response.data(), response.length());
+    } else {
+      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+      std::chrono::microseconds time = timeline.timeAtBeat(beat, quantum);
+      auto micros = std::chrono::duration_cast<std::chrono::microseconds>(time);
+      std::string response = "time-at-beat { :beat " + std::to_string(beat) +
+        " :quantum " + std::to_string(quantum) +
+        " :when " + std::to_string(micros.count()) + " }";
+      mg_send(nc, response.data(), response.length());
+    }
+  }
+}
+
+// Process a request to gracefully or forcibly realign the timeline
+static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, bool force) {
   std::stringstream ss(args);
   double beat;
   long when;
@@ -161,7 +190,11 @@ static void handleForceBeatAtTime(std::string args, struct mg_connection *nc) {
         mg_send(nc, response.data(), response.length());
       } else {
         ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-        timeline.forceBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+        if (force) {
+          timeline.forceBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+        } else {
+          timeline.requestBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+        }
         linkInstance.commitAppTimeline(timeline);
         reportStatus(nc);
       }
@@ -191,8 +224,12 @@ static void processMessage(std::string msg, struct mg_connection *nc) {
     handleBeatAtTime(args, nc);
   } else if (matchesCommand(msg, "phase-at-time ", args)) {
     handlePhaseAtTime(args, nc);
+  } else if (matchesCommand(msg, "time-at-beat ", args)) {
+    handleTimeAtBeat(args, nc);
   } else if (matchesCommand(msg, "force-beat-at-time ", args)) {
-    handleForceBeatAtTime(args, nc);
+    handleAdjustBeatAtTime(args, nc, true);
+  } else if (matchesCommand(msg, "request-beat-at-time ", args)) {
+    handleAdjustBeatAtTime(args, nc, false);
   } else if (matchesCommand(msg, "status", args)) {
     handleStatus(args, nc);
   } else {
@@ -255,7 +292,7 @@ void peersCallback(std::size_t numPeers) {
 int main(int argc, char* argv[]) {
   gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
                           " --port 1234 --poll 10");
-  gflags::SetVersionString("0.1.1");
+  gflags::SetVersionString("0.1.3");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   if (argc > 1) {
     std::cerr << "Unrecognized argument, " << argv[1] << std::endl;
