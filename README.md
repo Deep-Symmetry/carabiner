@@ -41,6 +41,12 @@ instructions on how to have it connect to Carabiner.
 You can shut down Carabiner by typing `Control-C` in the Terminal
 window, or simply closing that window.
 
+## Clients
+
+* [link-to-py](https://github.com/bdyetton/link-to-py) is a Python 3
+  module for interacting with Carabiner written
+  by [Benjamin Yetton](https://github.com/bdyetton).
+
 ## Building
 
 If you want to run Carabiner on a different platform, or make and test
