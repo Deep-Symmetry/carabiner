@@ -21,4 +21,4 @@ add_executable(Carabiner
 )
 
 target_link_libraries(Carabiner Ableton::Link gflags)
-
+target_link_libraries(Carabiner pthread)
