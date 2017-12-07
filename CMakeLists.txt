@@ -22,3 +22,7 @@ add_executable(Carabiner
 
 target_link_libraries(Carabiner Ableton::Link gflags)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  target_link_libraries(Carabiner pthread)
+endif()
+
