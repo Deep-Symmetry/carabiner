@@ -305,10 +305,10 @@ int main(int argc, char* argv[]) {
   linkInstance.enable(true);
 
   struct mg_mgr mgr;
-  const char *port = ("tcp://127.0.0.1:" + std::to_string(FLAGS_port)).c_str();
+  std::string port = "tcp://127.0.0.1:" + std::to_string(FLAGS_port);
 
   mg_mgr_init(&mgr, NULL);
-  mg_bind(&mgr, port, eventHandler);
+  mg_bind(&mgr, port.c_str(), eventHandler);
 
   std::cout << "Starting Carabiner on port " << port << std::endl;
 
