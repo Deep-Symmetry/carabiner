@@ -40,14 +40,19 @@ ableton::Link linkInstance(120.);
 std::set<struct mg_connection *> activeConnections, updatedConnections;
 std::mutex updatedMutex;
 
+// Keep track of whether we are synchronizing transport start/stop
+bool syncStartStop = false;
+
 // Send a message describing the current state of the Link session.
 static void reportStatus(struct mg_connection *nc) {
   const std::chrono::microseconds time = linkInstance.clock().micros();
   const ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+  std::string playingState = sessionState.isPlaying()? "true" : "false";
+  std::string playingResponse = syncStartStop? (" :playing " + playingState) : "";
   std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
     " :bpm " + std::to_string(sessionState.tempo()) +
     " :start " + std::to_string(sessionState.timeAtBeat(0.0, 4.0).count()) +
-    " :beat " + std::to_string(sessionState.beatAtTime(time, 4.0)) + " }";
+    " :beat " + std::to_string(sessionState.beatAtTime(time, 4.0)) + playingResponse + " }";
   mg_send(nc, response.data(), response.length());
 }
 
@@ -79,7 +84,7 @@ static void handleBpm(std::string args, struct mg_connection *nc) {
   }
 }
 
-// Process a request to query the SessionState
+// Process a request to query the SessionState to find out what beat occurs at a particular time
 static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   long when;
@@ -202,6 +207,31 @@ static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, b
   }
 }
 
+// Process a request to enable or disable start/stop sync
+static void handleEnableStartStopSync(bool enable, std::string args, struct mg_connection *nc) {
+  syncStartStop = enable;
+  linkInstance.enableStartStopSync(enable);
+  reportStatus(nc);
+}
+
+// Process a request to start or stop the shared transport state
+static void handleSetIsPlaying(bool playing, std::string args, struct mg_connection *nc) {
+  std::stringstream ss(args);
+  long when;
+
+  ss >> when;
+  if (ss.fail()) {
+    // Unparsed microsecond value, report error
+    std::string response = "bad-time " + args;
+    mg_send(nc, response.data(), response.length());
+  } else {
+    ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+    sessionState.setIsPlaying(playing, std::chrono::microseconds(when));
+    linkInstance.commitAppSessionState(sessionState);
+    reportStatus(nc);
+  }
+}
+
 // Check whether the packet contains the specified command; if so, remove the
 // command prefix from the arguments.
 static bool matchesCommand(std::string msg, std::string cmd, std::string& args) {
@@ -230,6 +260,14 @@ static void processMessage(std::string msg, struct mg_connection *nc) {
     handleAdjustBeatAtTime(args, nc, true);
   } else if (matchesCommand(msg, "request-beat-at-time ", args)) {
     handleAdjustBeatAtTime(args, nc, false);
+  } else if (matchesCommand(msg, "enable-start-stop-sync", args)) {
+    handleEnableStartStopSync(true, args, nc);
+  } else if (matchesCommand(msg, "disable-start-stop-sync", args)) {
+    handleEnableStartStopSync(false, args, nc);
+  } else if (matchesCommand(msg, "start-playing ", args)) {
+    handleSetIsPlaying(true, args, nc);
+  } else if (matchesCommand(msg, "stop-playing ", args)) {
+    handleSetIsPlaying(false, args, nc);
   } else if (matchesCommand(msg, "status", args)) {
     handleStatus(args, nc);
   } else {
@@ -289,6 +327,14 @@ void peersCallback(std::size_t numPeers) {
   updatedMutex.unlock();
 }
 
+// Registered to be called by a Link thread whenever the transport state changes if we are synchronizing
+// start/stop state; arranges for an update to be sent to all of our TCP clients.
+void startStopCallback(bool isPlaying) {
+  updatedMutex.lock();
+  updatedConnections.clear();
+  updatedMutex.unlock();
+}
+
 int main(int argc, char* argv[]) {
   gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
                           " --port 1234 --poll 10");
@@ -302,6 +348,8 @@ int main(int argc, char* argv[]) {
 
   linkInstance.setTempoCallback(tempoCallback);
   linkInstance.setNumPeersCallback(peersCallback);
+  linkInstance.setStartStopCallback(startStopCallback);
+  linkInstance.enableStartStopSync(syncStartStop);
   linkInstance.enable(true);
 
   struct mg_mgr mgr;
