@@ -43,11 +43,11 @@ std::mutex updatedMutex;
 // Send a message describing the current state of the Link session.
 static void reportStatus(struct mg_connection *nc) {
   const std::chrono::microseconds time = linkInstance.clock().micros();
-  const ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+  const ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
   std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
-    " :bpm " + std::to_string(timeline.tempo()) +
-    " :start " + std::to_string(timeline.timeAtBeat(0.0, 4.0).count()) +
-    " :beat " + std::to_string(timeline.beatAtTime(time, 4.0)) + " }";
+    " :bpm " + std::to_string(sessionState.tempo()) +
+    " :start " + std::to_string(sessionState.timeAtBeat(0.0, 4.0).count()) +
+    " :beat " + std::to_string(sessionState.beatAtTime(time, 4.0)) + " }";
   mg_send(nc, response.data(), response.length());
 }
 
@@ -72,14 +72,14 @@ static void handleBpm(std::string args, struct mg_connection *nc) {
     mg_send(nc, response.data(), response.length());
     std::cerr << "Failed to parse bpm: " << args << std::endl;
   }  else {
-    ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-    timeline.setTempo(bpm, linkInstance.clock().micros());
-    linkInstance.commitAppTimeline(timeline);
+    ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+    sessionState.setTempo(bpm, linkInstance.clock().micros());
+    linkInstance.commitAppSessionState(sessionState);
     // No neeed to call reportStatus(nc) because if the BPM changed that will happen on its own.
   }
 }
 
-// Process a request to query the timeline
+// Process a request to query the SessionState
 static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   long when;
@@ -97,8 +97,8 @@ static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
       std::string response = "bad-quantum " + args;
       mg_send(nc, response.data(), response.length());
     } else {
-      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-      double beat = timeline.beatAtTime(std::chrono::microseconds(when), quantum);
+      ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+      double beat = sessionState.beatAtTime(std::chrono::microseconds(when), quantum);
       std::string response = "beat-at-time { :when " + std::to_string(when) +
         " :quantum " + std::to_string(quantum) +
         " :beat " + std::to_string(beat) + " }";
@@ -107,7 +107,7 @@ static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
   }
 }
 
-// Process a request to query the current timeline phase
+// Process a request to query the current SessionState phase
 static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   long when;
@@ -125,8 +125,8 @@ static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
       std::string response = "bad-quantum " + args;
       mg_send(nc, response.data(), response.length());
     } else {
-      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-      double phase = timeline.phaseAtTime(std::chrono::microseconds(when), quantum);
+      ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+      double phase = sessionState.phaseAtTime(std::chrono::microseconds(when), quantum);
       std::string response = "phase-at-time { :when " + std::to_string(when) +
         " :quantum " + std::to_string(quantum) +
         " :phase " + std::to_string(phase) + " }";
@@ -135,7 +135,7 @@ static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
   }
 }
 
-// Process a request to determine when a specific beat falls on the timeline
+// Process a request to determine when a specific beat falls on the SessionState
 static void handleTimeAtBeat(std::string args, struct mg_connection *nc) {
   std::stringstream ss(args);
   double beat;
@@ -153,8 +153,8 @@ static void handleTimeAtBeat(std::string args, struct mg_connection *nc) {
       std::string response = "bad-quantum " + args;
       mg_send(nc, response.data(), response.length());
     } else {
-      ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
-      std::chrono::microseconds time = timeline.timeAtBeat(beat, quantum);
+      ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
+      std::chrono::microseconds time = sessionState.timeAtBeat(beat, quantum);
       auto micros = std::chrono::duration_cast<std::chrono::microseconds>(time);
       std::string response = "time-at-beat { :beat " + std::to_string(beat) +
         " :quantum " + std::to_string(quantum) +
@@ -164,7 +164,7 @@ static void handleTimeAtBeat(std::string args, struct mg_connection *nc) {
   }
 }
 
-// Process a request to gracefully or forcibly realign the timeline
+// Process a request to gracefully or forcibly realign the SessionState
 static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, bool force) {
   std::stringstream ss(args);
   double beat;
@@ -189,13 +189,13 @@ static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, b
         std::string response = "bad-quantum " + args;
         mg_send(nc, response.data(), response.length());
       } else {
-        ableton::Link::Timeline timeline = linkInstance.captureAppTimeline();
+        ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
         if (force) {
-          timeline.forceBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+          sessionState.forceBeatAtTime(beat, std::chrono::microseconds(when), quantum);
         } else {
-          timeline.requestBeatAtTime(beat, std::chrono::microseconds(when), quantum);
+          sessionState.requestBeatAtTime(beat, std::chrono::microseconds(when), quantum);
         }
-        linkInstance.commitAppTimeline(timeline);
+        linkInstance.commitAppSessionState(sessionState);
         reportStatus(nc);
       }
     }
@@ -313,7 +313,7 @@ int main(int argc, char* argv[]) {
   std::cout << "Starting Carabiner on port " << port << std::endl;
 
   for (;;) {
-    std::cout << "Link bpm: " << linkInstance.captureAppTimeline().tempo() <<
+    std::cout << "Link bpm: " << linkInstance.captureAppSessionState().tempo() <<
       " Peers: " << linkInstance.numPeers() <<
       " Connections: " << activeConnections.size() << "     \r" << std::flush;
 

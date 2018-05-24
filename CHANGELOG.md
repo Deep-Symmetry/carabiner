@@ -6,7 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+### Changed
+
+- Updated the embedded Link library to version 3.0.1 in preparation
+  for adding start/stop sync support.
 
 ## [0.1.3] - 2017-07-23
 
