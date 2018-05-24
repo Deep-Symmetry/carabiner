@@ -72,6 +72,10 @@ repository:
 Once the build completes you will find the executable in
 `bin/Carabiner` under the `build` directory.
 
+> :wrench: You can find instructions for building on Windows towards
+> the end of the discussion in [Issue
+> #4](https://github.com/brunchboy/carabiner/issues/4).
+
 ## Protocol
 
 Client programs interact with Carabiner by sending and receiving
@@ -91,9 +95,15 @@ message parameters. In this case, it identifies the current number of
 Link peers, the current tempo of the Link session, the timestamp
 of when the session timeline started, and the current beat position.
 
+If you have enabled Start/Stop Sync, status responses will also
+include the current transport state:
+
+    status { :peers 0 :bpm 120.000000 :start 73743731220 :beat 597.737570 :playing true }
+
 A status response will also be sent when you first connect to
 Carabiner, and whenever the Link session tempo changes, as well as
-whenever the number of Link peers changes.
+whenever the number of Link peers changes, and (if you have enabled
+Start/Stop Sync) when the transport state changes.
 
 > :stopwatch: **About Link Timestamps:** The `:start` value in the
 > above message, and the time and `:when` values sent and returned in
@@ -277,6 +287,50 @@ peers, the deisred mapping is established immediately when requested.
 Otherwise, we wait until the next time at which the session phase
 matches the desired event, so we can seamlessly join the peers that
 are already in the session.
+
+### enable-start-stop-sync
+
+Sending the string `enable-start-stop-sync` tells Carabiner to start
+synchronizing transport (playing) state with peers on the Link
+network. This is only supported in Link version 3 and later (which is
+used in Ableton Live 10 and later). Older peers will neither report
+their transport state, nor respond to changes you send through
+Carabiner.
+
+Carabiner responds with a `status` message which now includes a
+`:playing` value that reports the current transport state, `true` or
+`false`. From this point on, any changes to the shared Link transport
+state will cause a new `status` message to be sent to report the new
+state.
+
+### disable-start-stop-sync
+
+Sending the string `disable-start-stop-sync` tells Carabiner to stop
+synchronizing transport (playing) state with peers on the Link
+network.
+
+Carabiner responds with a `status` message which no longer includes a
+`:playing` value, and will no longer send status updates when the Link
+transport status changes.
+
+### start-playing
+
+Sending the string `start-playing` when Start/Stop Sync is enabled
+tells Carabiner to set the Link transport state to "playing", and
+inform any peers that are also participating in Start/Stop Sync.
+
+Carabiner responds with a `status` message which reflects the new
+transport state.
+
+### stop-playing
+
+Sending the string `stop-playing` when Start/Stop Sync is enabled
+tells Carabiner to set the Link transport state to "stopped", and
+inform any peers that are also participating in Start/Stop Sync.
+
+Carabiner responds with a `status` message which reflects the new
+transport state.
+
 
 ## Apology
 

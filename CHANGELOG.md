@@ -6,10 +6,22 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## [1.0.0] - 2018-05-24
+
+### Added
+
+- Implemented the `enable-start-stop-sync`, `disable-start-stop-sync`,
+  `start-playing`, and `stop-playing` commands, to support the new
+  transport control features in Link 3.0.
+- A Windows binary, and a tip linking to instructions for building it
+  in that environment.
+
 ### Changed
 
-- Updated the embedded Link library to version 3.0.1 in preparation
-  for adding start/stop sync support.
+- Updated the embedded Link library to version 3.0.1 to be able to
+  support start/stop sync.
 
 ## [0.1.3] - 2017-07-23
 
@@ -51,7 +63,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/carabiner/compare/v0.1.3...HEAD
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/brunchboy/carabiner/compare/v0.1.3...v1.0.0
 [0.1.3]: https://github.com/brunchboy/carabiner/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/brunchboy/carabiner/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/brunchboy/carabiner/compare/v0.1.0...v0.1.1
