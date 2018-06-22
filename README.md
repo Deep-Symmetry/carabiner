@@ -315,18 +315,24 @@ transport status changes.
 
 ### start-playing
 
-Sending the string `start-playing` when Start/Stop Sync is enabled
-tells Carabiner to set the Link transport state to "playing", and
-inform any peers that are also participating in Start/Stop Sync.
+Sending the string `start-playing` followed by a
+floating-point beat number, a microsecond timestamp (an integer
+relative to the `:start` value returned in the `status` response)
+when Start/Stop Sync is enabled tells Carabiner to set the Link 
+transport state to "playing", and inform any peers that are also 
+participating in Start/Stop Sync.
 
 Carabiner responds with a `status` message which reflects the new
 transport state.
 
 ### stop-playing
 
-Sending the string `stop-playing` when Start/Stop Sync is enabled
-tells Carabiner to set the Link transport state to "stopped", and
-inform any peers that are also participating in Start/Stop Sync.
+Sending the string `stop-playing` followed by a
+floating-point beat number, a microsecond timestamp (an integer
+relative to the `:start` value returned in the `status` response)
+when Start/Stop Sync is enabled tells Carabiner to set the Link 
+transport state to "stopped", and inform any peers that are also 
+participating in Start/Stop Sync.
 
 Carabiner responds with a `status` message which reflects the new
 transport state.
