@@ -350,10 +350,11 @@ transport state.
 
 Sending the string `version` asks Carabiner to report its version
 number. This is only supported starting with verson 1.1.0; previous
-versions will respond `unsupported version`, so you can assume that
-they are version 1.0.0 or earlier. Supported versions respond with
-`version` followed by the version string, for example `version
-"1.0.0"`.
+versions will respond `unsupported version` (which sounds pretty
+on-point, but really means that they don't know about the `version`
+command), so you can assume that they are version 1.0.0 or earlier.
+Supported versions respond with `version` followed by the version
+string, for example `version "1.1.0"`.
 
 
 ## Apology
