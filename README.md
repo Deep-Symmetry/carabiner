@@ -79,7 +79,24 @@ Once the build completes you will find the executable in
 ## Protocol
 
 Client programs interact with Carabiner by sending and receiving
-simple single-packet messages. The currently supported messages are:
+simple single-packet messages.
+
+> :point_right: To protect against multiple messages being read as
+> one, because they were sent right after one another and delivered as
+> a single network packet, you should always put a newline character
+> at the end of the message. As of version 1.1.0, Carabiner can
+> process multiple commands in a single network packet, as long as
+> they are separated by newlines. Trailing newlines will not cause any
+> problems for older versions of Carabiner, but those versions will
+> not see any commands following the first in a given packet.
+>
+> Similarly, Carabiner as of version 1.1.0, places newline characters
+> at the end of its own responses, and clients should be prepared to
+> deal with multiple responses in a single network packet in case they
+> have sent a query at roughly the same time that there was a change
+> in the Link status to be reported on.
+
+The currently supported messages are:
 
 ### status
 
@@ -127,8 +144,7 @@ above.
 
 If the bpm value is missing, cannot be parsed as a floating point
 number, or is outside the range from 20.0 to 999.0, the session tempo
-is left unchanged and Carabiner responds with the message `bad-bpm `
-followed by the argument you supplied.
+is left unchanged and Carabiner responds with the message `bad-bpm `.
 
 > If your client wants to use a tempo outside the range supported by
 > Link, Ableton recommends setting the Link tempo to the closest
@@ -154,8 +170,7 @@ Link session timeline, we are a quarter of the way from the sixth to
 the seventh beat (Link numbers beats starting with 0).
 
 If one of the parameters is missing or cannot be parsed, Carabiner
-responds with `bad-time ` or `bad-quantum ` followed by the arguments
-you gave it.
+responds with `bad-time ` or `bad-quantum `.
 
 ### phase-at-time
 
@@ -178,8 +193,7 @@ Link session timeline, we are just over a quarter of the way from the
 second to the third beat of the four beats in a quantum period.
 
 If one of the parameters is missing or cannot be parsed, Carabiner
-responds with `bad-time ` or `bad-quantum ` followed by the arguments
-you gave it.
+responds with `bad-time ` or `bad-quantum `.
 
 ### time-at-beat
 
@@ -215,8 +229,7 @@ start point has remained the same:
     status { :peers 0 :bpm 120.000000 :start 73743731220 :beat 2560.623742 }
 
 If one of the parameters is missing or cannot be parsed, Carabiner
-responds with `bad-beat ` or `bad-quantum ` followed by the arguments
-you gave it.
+responds with `bad-beat ` or `bad-quantum `.
 
 ### force-beat-at-time
 
@@ -245,8 +258,7 @@ exact):
     beat-at-time { :when 73746356220 :quantum 4.000000 :beat 1.000000 }
 
 If one of the parameters is missing or cannot be parsed, Carabiner
-responds with `bad-beat `, `bad-time `, or `bad-quantum ` followed by
-the arguments you gave it.
+responds with `bad-beat `, `bad-time `, or `bad-quantum `.
 
 This command should only be used when synchronizing a Link session to
 an external timing source which cannot participate in the
@@ -278,8 +290,7 @@ Carabiner responds with a `status` message which reports the
 new `:start` timestamp of the timeline.
 
 If one of the parameters is missing or cannot be parsed, Carabiner
-responds with `bad-beat `, `bad-time `, or `bad-quantum ` followed by
-the arguments you gave it.
+responds with `bad-beat `, `bad-time `, or `bad-quantum `.
 
 As the Link documentation explains, this command is specifically
 designed to enable the concept of "quantized launch". If there are no
@@ -334,6 +345,15 @@ participating in Start/Stop Sync.
 
 Carabiner responds with a `status` message which reflects the new
 transport state.
+
+### version
+
+Sending the string `version` asks Carabiner to report its version
+number. This is only supported starting with verson 1.1.0; previous
+versions will respond `unsupported version`, so you can assume that
+they are version 1.0.0 or earlier. Supported versions respond with
+`version` followed by the version string, for example `version
+"1.0.0"`.
 
 
 ## Apology

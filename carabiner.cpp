@@ -10,6 +10,9 @@ extern "C" {
 #include "mongoose.h"
 }
 
+// The version number, for the command line, as well as the client query.
+static const std::string version = "1.1.0";
+
 // Validators for command-line arguments
 static bool validatePort(const char* flagname, gflags::int32 value) {
   if (value > 0 && value < 32768) {
@@ -52,30 +55,42 @@ static void reportStatus(struct mg_connection *nc) {
   std::string response = "status { :peers " + std::to_string(linkInstance.numPeers()) +
     " :bpm " + std::to_string(sessionState.tempo()) +
     " :start " + std::to_string(sessionState.timeAtBeat(0.0, 4.0).count()) +
-    " :beat " + std::to_string(sessionState.beatAtTime(time, 4.0)) + playingResponse + " }";
+    " :beat " + std::to_string(sessionState.beatAtTime(time, 4.0)) + playingResponse + " }\n";
   mg_send(nc, response.data(), response.length());
 }
 
 // Process a request for the current link session status. Can simply remove the connection
 // from the set of those which have current status updates, and one will be sent on the next
 // poll.
-static void handleStatus(std::string args, struct mg_connection *nc) {
+static void handleStatus(std::stringstream &args, struct mg_connection *nc) {
   updatedMutex.lock();
   updatedConnections.erase(nc);
   updatedMutex.unlock();
 }
 
+static void handleVersion(std::stringstream &args, struct mg_connection *nc) {
+  std::string response = "version \"" + version + "\"\n";
+  mg_send(nc, response.data(), response.length());
+}
+
+// Report that an argument has not been usable, and skip to the next command within the
+// network packet, if any.
+static void reportBadArgument(std::string code, std::string message, std::stringstream &args,
+                              struct mg_connection *nc) {
+  std::string response = code + '\n';
+  mg_send(nc, response.data(), response.length());
+  std::cerr << std::endl << message << std::endl;
+  args.clear();
+  args.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
 // Process a request to establish a specific tempo
-static void handleBpm(std::string args, struct mg_connection *nc) {
-  std::stringstream ss(args);
+static void handleBpm(std::stringstream &args, struct mg_connection *nc) {
   double bpm;
 
-  ss >> bpm;
-  if (ss.fail() || (bpm < 20.0) || (bpm > 999.0)) {
-    // Unparsed bpm, report error
-    std::string response = "bad-bpm " + args;
-    mg_send(nc, response.data(), response.length());
-    std::cerr << "Failed to parse bpm: " << args << std::endl;
+  args >> bpm;
+  if (args.fail() || (bpm < 20.0) || (bpm > 999.0)) {
+    reportBadArgument("bad-bpm", "Failed to parse bpm", args, nc);
   }  else {
     ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
     sessionState.setTempo(bpm, linkInstance.clock().micros());
@@ -85,114 +100,93 @@ static void handleBpm(std::string args, struct mg_connection *nc) {
 }
 
 // Process a request to query the SessionState to find out what beat occurs at a particular time
-static void handleBeatAtTime(std::string args, struct mg_connection *nc) {
-  std::stringstream ss(args);
+static void handleBeatAtTime(std::stringstream &args, struct mg_connection *nc) {
   long when;
   double quantum;
 
-  ss >> when;
-  if (ss.fail()) {
-    // Unparsed microsecond value, report error
-    std::string response = "bad-time " + args;
-    mg_send(nc, response.data(), response.length());
+  args >> when;
+  if (args.fail()) {
+    reportBadArgument("bad-time", "Failed to parse beat time", args, nc);
   } else {
-    ss >> quantum;
-    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+    args >> quantum;
+    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
       // Unparsed quantum value, report error
-      std::string response = "bad-quantum " + args;
-      mg_send(nc, response.data(), response.length());
+      reportBadArgument("bad-quantum", "Failed to parse beat quantum", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       double beat = sessionState.beatAtTime(std::chrono::microseconds(when), quantum);
       std::string response = "beat-at-time { :when " + std::to_string(when) +
         " :quantum " + std::to_string(quantum) +
-        " :beat " + std::to_string(beat) + " }";
+        " :beat " + std::to_string(beat) + " }\n";
       mg_send(nc, response.data(), response.length());
     }
   }
 }
 
 // Process a request to query the current SessionState phase
-static void handlePhaseAtTime(std::string args, struct mg_connection *nc) {
-  std::stringstream ss(args);
+static void handlePhaseAtTime(std::stringstream &args, struct mg_connection *nc) {
   long when;
   double quantum;
 
-  ss >> when;
-  if (ss.fail()) {
-    // Unparsed microsecond value, report error
-    std::string response = "bad-time " + args;
-    mg_send(nc, response.data(), response.length());
+  args >> when;
+  if (args.fail()) {
+    reportBadArgument("bad-time", "Failed to parse phase time", args, nc);
   } else {
-    ss >> quantum;
-    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
-      // Unparsed quantum value, report error
-      std::string response = "bad-quantum " + args;
-      mg_send(nc, response.data(), response.length());
+    args >> quantum;
+    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      reportBadArgument("bad-quantum", "Failed to parse phase quantum", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       double phase = sessionState.phaseAtTime(std::chrono::microseconds(when), quantum);
       std::string response = "phase-at-time { :when " + std::to_string(when) +
         " :quantum " + std::to_string(quantum) +
-        " :phase " + std::to_string(phase) + " }";
+        " :phase " + std::to_string(phase) + " }\n";
       mg_send(nc, response.data(), response.length());
     }
   }
 }
 
 // Process a request to determine when a specific beat falls on the SessionState
-static void handleTimeAtBeat(std::string args, struct mg_connection *nc) {
-  std::stringstream ss(args);
+static void handleTimeAtBeat(std::stringstream &args, struct mg_connection *nc) {
   double beat;
   double quantum;
 
-  ss >> beat;
-  if (ss.fail()) {
-    // Unparsed beat value, report error
-    std::string response = "bad-beat " + args;
-    mg_send(nc, response.data(), response.length());
+  args >> beat;
+  if (args.fail()) {
+    reportBadArgument("bad-beat", "Failed to parse beat number", args, nc);
   } else {
-    ss >> quantum;
-    if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
-      // Unparsed quantum value, report error
-      std::string response = "bad-quantum " + args;
-      mg_send(nc, response.data(), response.length());
+    args >> quantum;
+    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      reportBadArgument("bad-quantum", "Failed to parse beat quantum", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       std::chrono::microseconds time = sessionState.timeAtBeat(beat, quantum);
       auto micros = std::chrono::duration_cast<std::chrono::microseconds>(time);
       std::string response = "time-at-beat { :beat " + std::to_string(beat) +
         " :quantum " + std::to_string(quantum) +
-        " :when " + std::to_string(micros.count()) + " }";
+        " :when " + std::to_string(micros.count()) + " }\n";
       mg_send(nc, response.data(), response.length());
     }
   }
 }
 
 // Process a request to gracefully or forcibly realign the SessionState
-static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, bool force) {
-  std::stringstream ss(args);
+static void handleAdjustBeatAtTime(std::stringstream &args, struct mg_connection *nc, bool force) {
   double beat;
   long when;
   double quantum;
 
-  ss >> beat;
-  if (ss.fail()) {
-    // Unparsed beat value, report error
-    std::string response = "bad-beat " + args;
-    mg_send(nc, response.data(), response.length());
+  args >> beat;
+  if (args.fail()) {
+    reportBadArgument("bad-beat", "Failed to parse beat number for adjustment", args, nc);
   } else {
-    ss >> when;
-    if (ss.fail()) {
-      // Unparsed microsecond value, report error
-      std::string response = "bad-time " + args;
-      mg_send(nc, response.data(), response.length());
+    args >> when;
+    if (args.fail()) {
+      reportBadArgument("bad-time", "Failed to parse beat time for adjustment", args, nc);
     } else {
-      ss >> quantum;
-      if (ss.fail() || (quantum < 2.0) || (quantum > 16.0)) {
-        // Unparsed quantum value, report error
-        std::string response = "bad-quantum " + args;
-        mg_send(nc, response.data(), response.length());
+      args >> quantum;
+      if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+        reportBadArgument("bad-quantum", "Failed to parse beat quantum for adjustment", args, nc);
       } else {
         ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
         if (force) {
@@ -208,22 +202,19 @@ static void handleAdjustBeatAtTime(std::string args, struct mg_connection *nc, b
 }
 
 // Process a request to enable or disable start/stop sync
-static void handleEnableStartStopSync(bool enable, std::string args, struct mg_connection *nc) {
+static void handleEnableStartStopSync(bool enable, std::stringstream &args, struct mg_connection *nc) {
   syncStartStop = enable;
   linkInstance.enableStartStopSync(enable);
   reportStatus(nc);
 }
 
 // Process a request to start or stop the shared transport state
-static void handleSetIsPlaying(bool playing, std::string args, struct mg_connection *nc) {
-  std::stringstream ss(args);
+static void handleSetIsPlaying(bool playing, std::stringstream &args, struct mg_connection *nc) {
   long when;
 
-  ss >> when;
-  if (ss.fail()) {
-    // Unparsed microsecond value, report error
-    std::string response = "bad-time " + args;
-    mg_send(nc, response.data(), response.length());
+  args >> when;
+  if (args.fail()) {
+    reportBadArgument("bad-time", "Failed to parse time for play or stop", args, nc);
   } else {
     ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
     sessionState.setIsPlaying(playing, std::chrono::microseconds(when));
@@ -232,48 +223,47 @@ static void handleSetIsPlaying(bool playing, std::string args, struct mg_connect
   }
 }
 
-// Check whether the packet contains the specified command; if so, remove the
-// command prefix from the arguments.
-static bool matchesCommand(std::string msg, std::string cmd, std::string& args) {
-  if (msg.substr(0, cmd.length()) == cmd) {
-    //std::cout << "  is " << cmd << "command!" << std::endl;
-    args = msg.substr(cmd.length(), std::string::npos);
-    return true;
-  }
-  return false;
-}
-
 // When a packet has been received, identify the command it contains, and handle it appropriately.
 static void processMessage(std::string msg, struct mg_connection *nc) {
   //std::cout << std::endl << "received: " << msg << std::endl;
 
-  std::string args;
-  if (matchesCommand(msg, "bpm ", args)) {
-    handleBpm(args, nc);
-  } else if (matchesCommand(msg, "beat-at-time ", args)) {
-    handleBeatAtTime(args, nc);
-  } else if (matchesCommand(msg, "phase-at-time ", args)) {
-    handlePhaseAtTime(args, nc);
-  } else if (matchesCommand(msg, "time-at-beat ", args)) {
-    handleTimeAtBeat(args, nc);
-  } else if (matchesCommand(msg, "force-beat-at-time ", args)) {
-    handleAdjustBeatAtTime(args, nc, true);
-  } else if (matchesCommand(msg, "request-beat-at-time ", args)) {
-    handleAdjustBeatAtTime(args, nc, false);
-  } else if (matchesCommand(msg, "enable-start-stop-sync", args)) {
-    handleEnableStartStopSync(true, args, nc);
-  } else if (matchesCommand(msg, "disable-start-stop-sync", args)) {
-    handleEnableStartStopSync(false, args, nc);
-  } else if (matchesCommand(msg, "start-playing ", args)) {
-    handleSetIsPlaying(true, args, nc);
-  } else if (matchesCommand(msg, "stop-playing ", args)) {
-    handleSetIsPlaying(false, args, nc);
-  } else if (matchesCommand(msg, "status", args)) {
-    handleStatus(args, nc);
-  } else {
-    // Unrecognized input, report error
-    std::string response = "unsupported " + msg;
-    mg_send(nc, response.data(), response.length());
+  std::stringstream args(msg);
+  args >> std::ws;
+  while (args.peek() != EOF) {
+    std::string cmd;
+    args >> cmd;
+    if (cmd == "bpm") {
+      handleBpm(args, nc);
+    } else if (cmd == "beat-at-time") {
+      handleBeatAtTime(args, nc);
+    } else if (cmd == "phase-at-time") {
+      handlePhaseAtTime(args, nc);
+    } else if (cmd == "time-at-beat") {
+      handleTimeAtBeat(args, nc);
+    } else if (cmd == "force-beat-at-time") {
+      handleAdjustBeatAtTime(args, nc, true);
+    } else if (cmd == "request-beat-at-time") {
+      handleAdjustBeatAtTime(args, nc, false);
+    } else if (cmd == "enable-start-stop-sync") {
+      handleEnableStartStopSync(true, args, nc);
+    } else if (cmd == "disable-start-stop-sync") {
+      handleEnableStartStopSync(false, args, nc);
+    } else if (cmd == "start-playing") {
+      handleSetIsPlaying(true, args, nc);
+    } else if (cmd == "stop-playing") {
+      handleSetIsPlaying(false, args, nc);
+    } else if (cmd == "status") {
+      handleStatus(args, nc);
+    } else if (cmd == "version") {
+      handleVersion(args, nc);
+    } else {
+      // Unrecognized input, report error
+      std::string response = "unsupported " + cmd + '\n';
+      mg_send(nc, response.data(), response.length());
+      std::cerr << std::endl << "Unrecognized command: " << cmd << std::endl;
+      args.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    args >> std::ws;
   }
 }
 
@@ -338,7 +328,7 @@ void startStopCallback(bool isPlaying) {
 int main(int argc, char* argv[]) {
   gflags::SetUsageMessage("Bridge to an Ableton Link session. Sample usage:\n" + std::string(argv[0]) +
                           " --port 1234 --poll 10");
-  gflags::SetVersionString("1.0.0");
+  gflags::SetVersionString(version);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   if (argc > 1) {
     std::cerr << "Unrecognized argument, " << argv[1] << std::endl;

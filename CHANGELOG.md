@@ -6,6 +6,19 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+### Added
+
+- A way for clients to check the Carabiner version, so Beat Link
+  Trigger can know whether the multi-message packets issue has been
+  fixed and warn the user to upgrade Carabiner if needed.
+
+### Fixed
+
+- If multiple messages were sent rapidly to or from Carabiner they
+  might get grouped into a single network packet, and the later ones
+  would be ignored. This release, along with a newer Beat Link Trigger
+  release, process even later messages grouped in the same packet.
+
 Nothing so far.
 
 ## [1.0.0] - 2018-05-24
