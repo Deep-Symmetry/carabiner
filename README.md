@@ -90,11 +90,11 @@ simple single-packet messages.
 > problems for older versions of Carabiner, but those versions will
 > not see any commands following the first in a given packet.
 >
-> Similarly, Carabiner as of version 1.1.0, places newline characters
-> at the end of its own responses, and clients should be prepared to
-> deal with multiple responses in a single network packet in case they
-> have sent a query at roughly the same time that there was a change
-> in the Link status to be reported on.
+> Similarly, starting with version 1.1.0, Carabiner places newline
+> characters at the end of its own responses, and clients should be
+> prepared to deal with multiple responses in a single network packet
+> in case they have sent a query at roughly the same time that there
+> was a change in the Link status to be reported on.
 
 The currently supported messages are:
 
