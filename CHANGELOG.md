@@ -8,6 +8,7 @@ This change log follows the conventions of
 
 Nothing so far.
 
+
 ## [1.1.0] - 2018-08-27
 
 ### Added
@@ -23,7 +24,6 @@ Nothing so far.
   would be ignored. This release, along with a newer Beat Link Trigger
   release, process even later messages grouped in the same packet.
 
-Nothing so far.
 
 ## [1.0.0] - 2018-05-24
 
@@ -40,6 +40,7 @@ Nothing so far.
 - Updated the embedded Link library to version 3.0.1 to be able to
   support start/stop sync.
 
+
 ## [0.1.3] - 2017-07-23
 
 ### Added
@@ -53,12 +54,14 @@ Nothing so far.
 - Improved some details in the documentation.
 - Updated the embedded Link library to incorporate fixes.
 
+
 ## [0.1.2] - 2017-04-22
 
 ### Changed
 
 - Updated the embedded Link library to incorporate recent
   improvements, such as supporting Carabiner on the Raspberry Pi.
+
 
 ## [0.1.1] - 2016-11-20
 
@@ -70,6 +73,7 @@ Nothing so far.
 
 - Support the actual tempo range that Link itself supports, from 20 to
   999 BPM.
+
 
 ## 0.1.0 - 2016-11-09
 
