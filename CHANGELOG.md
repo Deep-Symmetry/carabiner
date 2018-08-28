@@ -6,6 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## [1.1.0] - 2018-08-27
+
 ### Added
 
 - A way for clients to check the Carabiner version, so Beat Link
@@ -76,7 +80,8 @@ Nothing so far.
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/brunchboy/carabiner/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/brunchboy/carabiner/compare/v0.1.3...v1.0.0
 [0.1.3]: https://github.com/brunchboy/carabiner/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/brunchboy/carabiner/compare/v0.1.1...v0.1.2
