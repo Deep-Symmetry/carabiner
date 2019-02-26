@@ -359,7 +359,7 @@ string, for example `version "1.1.0"`.
 
 ## Apology
 
-I am not a C++ programmer; the last time I wrote anyting in it before
+I am not a C++ programmer; the last time I wrote anything in it before
 Carabiner was in the early 1990s. This seems to work, but I am sure it
 could be written much better. Suggestions for improvement are
 definitely welcome!
