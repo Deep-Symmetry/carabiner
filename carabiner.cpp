@@ -11,7 +11,7 @@ extern "C" {
 }
 
 // The version number, for the command line, as well as the client query.
-static const std::string version = "1.1.0";
+static const std::string version = "1.1.1";
 
 // Validators for command-line arguments
 static bool validatePort(const char* flagname, gflags::int32 value) {
@@ -74,12 +74,28 @@ static void handleVersion(std::stringstream &args, struct mg_connection *nc) {
 }
 
 // Report that an argument has not been usable, and skip to the next command within the
-// network packet, if any.
+// network packet, if any. If a parse error occurred, show the full message and location
+// of the problem.
 static void reportBadArgument(std::string code, std::string message, std::stringstream &args,
                               struct mg_connection *nc) {
   std::string response = code + '\n';
   mg_send(nc, response.data(), response.length());
-  std::cerr << std::endl << message << std::endl;
+
+  if (args.fail()) {
+    args.clear(args.rdstate() & ~std::ios::failbit);
+    int position = args.tellg();
+    std::string failed;
+    args >> failed;
+    std::cerr << std::endl << message << " [" << failed << "]" << std::endl;
+    std::cerr << " rough problem location: ";
+    for (int i = 0; i < position; i++) {
+      std::cerr << "-";
+    }
+    std::cerr << "v" << std::endl;
+    std::cerr << "  full message received: " << args.str() << std::endl;
+  } else {
+    std::cerr << std::endl << message << std::endl;
+  }
   args.clear();
   args.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
@@ -89,9 +105,12 @@ static void handleBpm(std::stringstream &args, struct mg_connection *nc) {
   double bpm;
 
   args >> bpm;
-  if (args.fail() || (bpm < 20.0) || (bpm > 999.0)) {
+  if (args.fail()) {
     reportBadArgument("bad-bpm", "Failed to parse bpm", args, nc);
-  }  else {
+  } else if ((bpm < 20.0) || (bpm > 999.0)) {
+    reportBadArgument("bad-bpm", "Recieved illegal bpm, " + std::to_string(bpm) +
+                      "; must be in range 20.0 to 999.0", args, nc);
+  } else {
     ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
     sessionState.setTempo(bpm, linkInstance.clock().micros());
     linkInstance.commitAppSessionState(sessionState);
@@ -109,9 +128,11 @@ static void handleBeatAtTime(std::stringstream &args, struct mg_connection *nc) 
     reportBadArgument("bad-time", "Failed to parse beat time", args, nc);
   } else {
     args >> quantum;
-    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
-      // Unparsed quantum value, report error
+    if (args.fail()) {
       reportBadArgument("bad-quantum", "Failed to parse beat quantum", args, nc);
+    } else if ((quantum < 2.0) || (quantum > 16.0)) {
+      reportBadArgument("bad-quantum", "Received illegal beat quantum, " + std::to_string(quantum) +
+                        "; must be in range 2.0 to 16.0", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       double beat = sessionState.beatAtTime(std::chrono::microseconds(when), quantum);
@@ -133,8 +154,11 @@ static void handlePhaseAtTime(std::stringstream &args, struct mg_connection *nc)
     reportBadArgument("bad-time", "Failed to parse phase time", args, nc);
   } else {
     args >> quantum;
-    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+    if (args.fail()) {
       reportBadArgument("bad-quantum", "Failed to parse phase quantum", args, nc);
+    } else if ((quantum < 2.0) || (quantum > 16.0)) {
+      reportBadArgument("bad-quantum", "Received illegal phase quantum, " + std::to_string(quantum) +
+                        "; must be in range 2.0 to 16.0", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       double phase = sessionState.phaseAtTime(std::chrono::microseconds(when), quantum);
@@ -156,8 +180,11 @@ static void handleTimeAtBeat(std::stringstream &args, struct mg_connection *nc) 
     reportBadArgument("bad-beat", "Failed to parse beat number", args, nc);
   } else {
     args >> quantum;
-    if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+    if (args.fail()) {
       reportBadArgument("bad-quantum", "Failed to parse beat quantum", args, nc);
+    } else if ((quantum < 2.0) || (quantum > 16.0)) {
+      reportBadArgument("bad-quantum", "Received illegal beat quantum, " + std::to_string(quantum) +
+                        "; must be in range 2.0 to 16.0", args, nc);
     } else {
       ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
       std::chrono::microseconds time = sessionState.timeAtBeat(beat, quantum);
@@ -185,8 +212,11 @@ static void handleAdjustBeatAtTime(std::stringstream &args, struct mg_connection
       reportBadArgument("bad-time", "Failed to parse beat time for adjustment", args, nc);
     } else {
       args >> quantum;
-      if (args.fail() || (quantum < 2.0) || (quantum > 16.0)) {
+      if (args.fail()) {
         reportBadArgument("bad-quantum", "Failed to parse beat quantum for adjustment", args, nc);
+      } else if ((quantum < 2.0) || (quantum > 16.0)) {
+        reportBadArgument("bad-quantum", "Received illegal beat quantum for adjustment, " + std::to_string(quantum) +
+                          "; must be in range 2.0 to 16.0", args, nc);
       } else {
         ableton::Link::SessionState sessionState = linkInstance.captureAppSessionState();
         if (force) {

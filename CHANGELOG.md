@@ -6,8 +6,13 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+### Added
 
+- More detailed error information is printed in the window in which
+  Carabiner is running when there is a problem parsing a value it has
+  received. Hopefully this can help figure out a problem people are
+  running into in Windows sometimes when the beat numbers for the
+  `beat-at-time` command are being unusable.
 
 ## [1.1.0] - 2018-08-27
 
