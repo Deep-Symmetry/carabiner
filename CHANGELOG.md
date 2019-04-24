@@ -6,6 +6,13 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+### Fixed
+
+- It turns out that C++ integer types are half the size of Java
+  integer types, so the Java `long` values that are sent by Beat Link
+  Trigger as time stamps need to be declared as `long long` values in
+  C++. This change fixes parse errors people were running into.
+
 ### Added
 
 - More detailed error information is printed in the window in which

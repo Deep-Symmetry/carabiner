@@ -120,7 +120,7 @@ static void handleBpm(std::stringstream &args, struct mg_connection *nc) {
 
 // Process a request to query the SessionState to find out what beat occurs at a particular time
 static void handleBeatAtTime(std::stringstream &args, struct mg_connection *nc) {
-  long when;
+  long long when;
   double quantum;
 
   args >> when;
@@ -146,7 +146,7 @@ static void handleBeatAtTime(std::stringstream &args, struct mg_connection *nc) 
 
 // Process a request to query the current SessionState phase
 static void handlePhaseAtTime(std::stringstream &args, struct mg_connection *nc) {
-  long when;
+  long long when;
   double quantum;
 
   args >> when;
@@ -200,7 +200,7 @@ static void handleTimeAtBeat(std::stringstream &args, struct mg_connection *nc) 
 // Process a request to gracefully or forcibly realign the SessionState
 static void handleAdjustBeatAtTime(std::stringstream &args, struct mg_connection *nc, bool force) {
   double beat;
-  long when;
+  long long when;
   double quantum;
 
   args >> beat;
@@ -240,7 +240,7 @@ static void handleEnableStartStopSync(bool enable, std::stringstream &args, stru
 
 // Process a request to start or stop the shared transport state
 static void handleSetIsPlaying(bool playing, std::stringstream &args, struct mg_connection *nc) {
-  long when;
+  long long when;
 
   args >> when;
   if (args.fail()) {
