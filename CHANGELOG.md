@@ -6,6 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## [1.1.1] - 2019-04-24
+
 ### Fixed
 
 - It turns out that C++ integer types are half the size of Java
@@ -96,7 +100,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.0...HEAD
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/brunchboy/carabiner/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/brunchboy/carabiner/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/brunchboy/carabiner/compare/v0.1.3...v1.0.0
 [0.1.3]: https://github.com/brunchboy/carabiner/compare/v0.1.2...v0.1.3
