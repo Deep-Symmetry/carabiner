@@ -12,10 +12,13 @@ Nothing so far.
 
 ### Fixed
 
-- It turns out that C++ integer types are half the size of Java
-  integer types, so the Java `long` values that are sent by Beat Link
-  Trigger as time stamps need to be declared as `long long` values in
-  C++. This change fixes parse errors people were running into.
+- It turns out that C++ `long` types [in 64-bit
+  Windows](https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models)
+  are half the size of the Java `long` type used by Beat Link Trigger,
+  so values BLT is sending as time stamps need to be declared as `long
+  long` values in C++ to be properly received in Windows. This change
+  fixes parse errors people were running into. (It should also make it
+  safe to compile and run in a 32-bit OS.)
 
 ### Added
 
