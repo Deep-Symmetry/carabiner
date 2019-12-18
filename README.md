@@ -20,7 +20,7 @@ not written using C++ compatible languages and runtimes.
 
 ## Usage
 
-If you are on a Mac OS X, Windows x64, or Rapberry Pi system,
+If you are on a Mac OS X, Windows x64, or Raspberry Pi system,
 you can download the executable from the
 [releases](https://github.com/brunchboy/carabiner/releases) page.
 Then just open a terminal window, and run it:
