@@ -20,13 +20,13 @@ not written using C++ compatible languages and runtimes.
 
 ## Usage
 
-If you are on a Mac OS X or Windows x64 system,
+If you are on a Mac OS X, Windows x64, or Rapberry Pi system,
 you can download the executable from the
 [releases](https://github.com/brunchboy/carabiner/releases) page.
 Then just open a terminal window, and run it:
 
     > Carabiner
-    Starting Carabiner on port tcp://127.0.0.1:17000
+    Starting Carabiner 1.1.2 on port tcp://127.0.0.1:17000
     Link bpm: 128.5 Peers: 1 Connections: 0
 
 By default it listens on port 17000. If this port is already in use on

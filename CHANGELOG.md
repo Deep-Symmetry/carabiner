@@ -8,6 +8,17 @@ This change log follows the conventions of
 
 Nothing so far.
 
+## [1.1.2] - 2019-12-17
+
+### Added
+
+- A `--daemon` boolean option to shut off the status line output,
+  since that does nothing but flood the system log when Carabiner is
+  running as an operating system background process.
+- A Raspberry Pi build, since I now own one.
+- Also now reports the version number in the startup message, which is
+  helpful when scanning the system log.
+
 ## [1.1.1] - 2019-04-24
 
 ### Fixed
@@ -103,7 +114,8 @@ Nothing so far.
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.1...HEAD
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/brunchboy/carabiner/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/brunchboy/carabiner/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/brunchboy/carabiner/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/brunchboy/carabiner/compare/v0.1.3...v1.0.0

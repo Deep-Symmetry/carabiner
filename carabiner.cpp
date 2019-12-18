@@ -11,7 +11,7 @@ extern "C" {
 }
 
 // The version number, for the command line, as well as the client query.
-static const std::string version = "1.1.1";
+static const std::string version = "1.1.2";
 
 // Validators for command-line arguments
 static bool validatePort(const char* flagname, gflags::int32 value) {
@@ -35,6 +35,7 @@ DEFINE_int32(port, 17000, "TCP port on which to accept connections");
 static const bool port_dummy = gflags::RegisterFlagValidator(&FLAGS_port, &validatePort);
 DEFINE_int32(poll, 20, "Number of milliseconds between updates");
 static const bool poll_dummy = gflags::RegisterFlagValidator(&FLAGS_poll, &validatePoll);
+DEFINE_bool(daemon, false, "Operate in daemon mode, suppresses status line");
 
 // Our interface to the Link session
 ableton::Link linkInstance(120.);
@@ -378,13 +379,14 @@ int main(int argc, char* argv[]) {
   mg_mgr_init(&mgr, NULL);
   mg_bind(&mgr, port.c_str(), eventHandler);
 
-  std::cout << "Starting Carabiner on port " << port << std::endl;
+  std::cout << "Starting Carabiner " << version << " on port " << port << std::endl;
 
   for (;;) {
-    std::cout << "Link bpm: " << linkInstance.captureAppSessionState().tempo() <<
-      " Peers: " << linkInstance.numPeers() <<
-      " Connections: " << activeConnections.size() << "     \r" << std::flush;
-
+    if (!FLAGS_daemon) {
+      std::cout << "Link bpm: " << linkInstance.captureAppSessionState().tempo() <<
+	" Peers: " << linkInstance.numPeers() <<
+	" Connections: " << activeConnections.size() << "     \r" << std::flush;
+    }
     mg_mgr_poll(&mgr, FLAGS_poll);
   }
   mg_mgr_free(&mgr);
