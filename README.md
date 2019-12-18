@@ -42,6 +42,11 @@ instructions on how to have it connect to Carabiner.
 You can shut down Carabiner by typing `Control-C` in the Terminal
 window, or simply closing that window.
 
+> If you want to run Carabiner as a system daemon (background process
+> that starts when the system boots), add `--daemon` to the command line
+> you configure to start it up, so that it does not spam the system log
+> with status line updates that you can't see anyway.
+
 ## Clients
 
 * [link-to-py](https://github.com/bdyetton/link-to-py) is a Python 3
