@@ -7,7 +7,9 @@ on:
 
 env:
   windows_zip_name: 'Carabiner_Win_x64.zip'
-  mac_zip_name: 'Carabiner_Mac.zip'
+  mac_dmg_name: 'Carabiner_Mac.zip'
+  mac_signing_name: "Deep Symmetry, LLC (9M6LKU948Y)"
+  mac_notarization_user: "james@deepsymmetry.org"
 
 jobs:
   build_windows:
@@ -55,16 +57,12 @@ jobs:
       with:
         tag-var-name: release_tag
 
-    - name: Compile and zip executable
-      run: |
-        git submodule update --init --recursive
-        mkdir build
-        cd build
-        cmake ..
-        cmake --build .
-        cd bin
-        zip -r $mac_zip_name Carabiner
-        mv $mac_zip_name ../..
+    - name: Build, sign, and notarize macOS disk image
+      env:
+        IDENTITY_PASSPHRASE: ${{ secrets.IDENTITY_PASSPHRASE }}
+        IDENTITY_P12_B64: ${{ secrets.IDENTITY_P12_B64 }}
+        NOTARIZATION_PW: ${{ secrets.NOTARIZATION_PW }}
+      run: zsh .github/scripts/build_dmg.zsh
 
     - name: Upload macOS disk image
       if: success()
@@ -72,7 +70,7 @@ jobs:
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
-        assets: ${{ env.mac_zip_name }}
+        assets: ${{ env.mac_dmg_name }}
         github_token: ${{ github.token }}
 
 
