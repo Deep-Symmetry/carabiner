@@ -11,7 +11,7 @@ extern "C" {
 }
 
 // The version number, for the command line, as well as the client query.
-static const std::string version = "1.1.2";
+static const std::string version = "1.1.3";
 
 // Validators for command-line arguments
 static bool validatePort(const char* flagname, gflags::int32 value) {
