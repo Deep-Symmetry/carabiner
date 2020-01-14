@@ -1,0 +1,86 @@
+name: Create executables
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  windows_zip_name: 'Carabiner_Win_x64.zip'
+  mac_zip_name: 'Carabiner_Mac.zip'
+
+jobs:
+  build_windows:
+    name: Build Windows executable
+    runs-on: windows-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: Deep-Symmetry/github-version-action@v1
+      with:
+        tag-var-name: release_tag
+
+    - name: Compile and zip executable
+      run: |
+        git submodule update --init --recursive
+        mkdir build
+        cd build
+        cmake -g "Visual Studio 15 2017" ..
+        cmake --build . --config Release
+        cd bin\Release
+        7z a $env:windows_zip_name Carabiner.exe
+        mv $env:windows_zip_name ..\..\..
+
+    - name: Upload Windows executable
+      if: success()
+      uses: Xotl/cool-github-releases@v1
+      with:
+        mode: update
+        tag_name: ${{ env.release_tag }}
+        assets: ${{ env.windows_zip_name }}
+        github_token: ${{ github.token }}
+
+
+  build_mac:
+    name: Build macOS executable
+    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: Deep-Symmetry/github-version-action@v1
+      with:
+        tag-var-name: release_tag
+
+    - name: Compile and zip executable
+      run: |
+        git submodule update --init --recursive
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+        cd bin
+        7z a $mac_zip_name Carabiner
+        mv $mac_zip_name ../..
+
+    - name: Upload macOS disk image
+      if: success()
+      uses: Xotl/cool-github-releases@v1
+      with:
+        mode: update
+        tag_name: ${{ env.release_tag }}
+        assets: ${{ env.mac_zip_name }}
+        github_token: ${{ github.token }}
+
+
+  succeed_if_skipped:
+    name: Skipping CI
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    - name: Placate GitHub Actions
+      run: echo "CI skipped but want action to succeed anyway."
