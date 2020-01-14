@@ -63,7 +63,7 @@ jobs:
         cmake ..
         cmake --build .
         cd bin
-        7z a $mac_zip_name Carabiner
+        zip -r $mac_zip_name Carabiner
         mv $mac_zip_name ../..
 
     - name: Upload macOS disk image
