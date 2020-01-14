@@ -26,12 +26,11 @@ jobs:
 
     - name: Determine snapshot status
       run: |
-        if [[ $release_tag =~ .*-SNAPSHOT ]]
-        then
+        If ($env:release_tag -like '*-SNAPSHOT') {
           echo "::set-env name=release_snapshot::true"
-        else
+        } Else {
           echo "::set-env name=release_snapshot::false"
-        fi
+        }
 
     - name: Compile and zip executable
       run: |
