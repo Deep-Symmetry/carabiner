@@ -24,6 +24,15 @@ jobs:
       with:
         tag-var-name: release_tag
 
+    - name: Determine snapshot status
+      run: |
+        if [[ $release_tag =~ .*-SNAPSHOT ]]
+        then
+          echo "::set-env name=release_snapshot::true"
+        else
+          echo "::set-env name=release_snapshot::false"
+        fi
+
     - name: Compile and zip executable
       run: |
         git submodule update --init --recursive
@@ -37,13 +46,20 @@ jobs:
 
     - name: Upload Windows executable
       if: success()
-      uses: Xotl/cool-github-releases@v1
+      uses: brunchboy/cool-github-releases@master
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
         isPrerelease: true
+        replace_assets: ${{ env.release_snapshot }}
         assets: ${{ env.windows_zip_name }}
         github_token: ${{ github.token }}
+        initial_mrkdwn: |
+          :construction: This is pre-release code for people who want to help test [what is going into the next release](https://github.com/Deep-Symmetry/carabiner/blob/master/CHANGELOG.md).
+
+          > Don’t download this if you aren’t comfortable testing code while it is under active development! Instead, look at the [latest release](https:///github.com/Deep-Symmetry/carabiner/releases/latest).
+
+          Please note that since it’s a snapshot release, the executables below (you may need to click to expand the Assets) will change frequently—whenever new code is pushed to the project—so you will want to _download the latest version every time you work with one_.
 
 
   build_mac:
@@ -58,6 +74,15 @@ jobs:
       with:
         tag-var-name: release_tag
 
+    - name: Determine snapshot status
+      run: |
+        if [[ $release_tag =~ .*-SNAPSHOT ]]
+        then
+          echo "::set-env name=release_snapshot::true"
+        else
+          echo "::set-env name=release_snapshot::false"
+        fi
+
     - name: Build, sign, and notarize macOS disk image
       env:
         IDENTITY_PASSPHRASE: ${{ secrets.IDENTITY_PASSPHRASE }}
@@ -67,13 +92,20 @@ jobs:
 
     - name: Upload macOS disk image
       if: success()
-      uses: Xotl/cool-github-releases@v1
+      uses: brunchboy/cool-github-releases@master
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
         isPrerelease: true
+        replace_assets: ${{ env.release_snapshot }}
         assets: ${{ env.mac_dmg_name }}
         github_token: ${{ github.token }}
+        initial_mrkdwn: |
+          :construction: This is pre-release code for people who want to help test [what is going into the next release](https://github.com/Deep-Symmetry/carabiner/blob/master/CHANGELOG.md).
+
+          > Don’t download this if you aren’t comfortable testing code while it is under active development! Instead, look at the [latest release](https:///github.com/Deep-Symmetry/carabiner/releases/latest).
+
+          Please note that since it’s a snapshot release, the executables below (you may need to click to expand the Assets) will change frequently—whenever new code is pushed to the project—so you will want to _download the latest version every time you work with one_.
 
 
   succeed_if_skipped:
