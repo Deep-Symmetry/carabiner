@@ -6,7 +6,11 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+### Added
+
+- Now automatically build and release the Mac and Windows executables
+  whenever changes are pushed to this repository, thanks to the power
+  of GitHub Actions.
 
 ## [1.1.2] - 2019-12-17
 

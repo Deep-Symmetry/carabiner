@@ -67,7 +67,7 @@ submodules by running:
 
 Carabiner uses [CMake](https://www.cmake.org/) to manage its build
 process. Once again, from the top-level directory of your `carabiner`
-repository:
+repository. On the Mac, and other Unix platforms:
 
     mkdir build
     cd build
@@ -77,9 +77,17 @@ repository:
 Once the build completes you will find the executable in
 `bin/Carabiner` under the `build` directory.
 
-> :wrench: You can find instructions for building on Windows towards
-> the end of the discussion in [Issue
-> #4](https://github.com/brunchboy/carabiner/issues/4).
+> :wrench: On Windows, you need to install both cmake for Windows and
+> Visual Studio 2017. Then you can use the following variation
+> (after updating the git submodules, as described above):
+
+    mkdir build
+    cd build
+    cmake -g "Visual Studio 15 2017" ..
+    cmake --build . --config Release
+
+Once the build completes you will find the executable in
+`bin\Release\Carabiner.exe` under the `build` directory.
 
 ## Protocol
 
