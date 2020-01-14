@@ -7,7 +7,7 @@ on:
 
 env:
   windows_zip_name: 'Carabiner_Win_x64.zip'
-  mac_dmg_name: 'Carabiner_Mac.zip'
+  mac_dmg_name: 'Carabiner_Mac.dmg'
   mac_signing_name: "Deep Symmetry, LLC (9M6LKU948Y)"
   mac_notarization_user: "james@deepsymmetry.org"
 
