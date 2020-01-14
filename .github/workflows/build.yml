@@ -41,6 +41,7 @@ jobs:
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
+        isPrerelease: true
         assets: ${{ env.windows_zip_name }}
         github_token: ${{ github.token }}
 
@@ -70,6 +71,7 @@ jobs:
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
+        isPrerelease: true
         assets: ${{ env.mac_dmg_name }}
         github_token: ${{ github.token }}
 
