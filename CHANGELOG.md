@@ -11,6 +11,8 @@ This change log follows the conventions of
 - Now automatically build and release the Mac and Windows executables
   whenever changes are pushed to this repository, thanks to the power
   of GitHub Actions.
+- Mac executables are released as code-signed, notarized disk images
+  for ease of use on Catalina.
 
 ## [1.1.2] - 2019-12-17
 
