@@ -30,7 +30,7 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     security set-key-partition-list -S apple-tool:,apple: -s -k "$IDENTITY_PASSPHRASE" build.keychain
 
     # Code sign the disk image.
-    codesign -s $mac_signing_name $mac_dmg_name
+    codesign --deep --timestamp --options runtime --sign $mac_signing_name $mac_dmg_name
 
     # Submit the disk image to Apple for notarization.
     xcrun altool --notarize-app --primary-bundle-id "org.deepsymmetry.carabiner" \
