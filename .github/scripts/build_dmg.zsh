@@ -30,9 +30,11 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     security set-key-partition-list -S apple-tool:,apple: -s -k "$IDENTITY_PASSPHRASE" build.keychain
 
     # Code sign the disk image.
+    echo "Code signing the disk image."
     codesign --deep --timestamp --options runtime --sign $mac_signing_name $mac_dmg_name
 
     # Submit the disk image to Apple for notarization.
+    echo "Sumbitting the disk image to Apple for notarization..."
     xcrun altool --notarize-app --primary-bundle-id "org.deepsymmetry.carabiner" \
           --username "$mac_notarization_user" --password "$NOTARIZATION_PW" \
           --file "$mac_dmg_name" --output-format xml > upload_result.plist
@@ -47,10 +49,12 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
         if [ "`/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" status.plist`" != "in progress" ]; then
             break;
         fi
+        echo "...still waiting for notarization to finish..."
     done
 
     # See if notarization succeeded, and if so, staple the ticket to the disk image.
     if [ `/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" status.plist` = "success" ]; then
+        echo "Notarization succeeded, stapling receipt to disk image."
         xcrun stapler staple "$mac_dmg_name"
     else
         false;
