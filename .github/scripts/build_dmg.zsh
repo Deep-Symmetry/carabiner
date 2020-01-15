@@ -31,7 +31,7 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
 
     # Code sign the disk image.
     echo "Code signing the disk image."
-    codesign --deep --timestamp --options runtime --sign $mac_signing_name $mac_dmg_name
+    codesign --verbose --deep --timestamp --options runtime --sign $mac_signing_name $mac_dmg_name
 
     # Submit the disk image to Apple for notarization.
     echo "Sumbitting the disk image to Apple for notarization..."
