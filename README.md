@@ -42,10 +42,54 @@ instructions on how to have it connect to Carabiner.
 You can shut down Carabiner by typing `Control-C` in the Terminal
 window, or simply closing that window.
 
-> If you want to run Carabiner as a system daemon (background process
-> that starts when the system boots), add `--daemon` to the command line
-> you configure to start it up, so that it does not spam the system log
-> with status line updates that you can't see anyway.
+> If you want to run Carabiner as a system daemon (an always-available
+> background process that starts when the system boots), add
+> `--daemon` to the command line you configure to start it up, so that
+> it does not spam the system log with status line updates that you
+> can't see anyway.
+
+## Running on the Mac
+
+You will need to open the Terminal window yourself and run Carabiner
+by typing the path to the program. Previously you could run programs
+like this by double-clicking them in the Finder, but an issue with the
+Mac's download security model prevents that today. It will still work
+if you built it from source, but if you downloaded it, you will see a
+complaint about being unable to confirm the identity of the developer.
+That's not actually true: if you downloaded it from the project's
+Releases page on GitHub, it has been properly code-signed and
+notarized by Deep Symmetry, but that is only honored when you run it
+from an already-open terminal window. You can confirm the signature,
+if you want to be sure, by running the following command (from the
+directory in which you placed Carabiner, or put a full path to the
+file as the last argument):
+
+    > spctl --assess --type install -vv Carabiner
+
+When your copy is properly signed you will see this output:
+
+    Carabiner: accepted
+    source=Notarized Developer ID
+    origin=Developer ID Application: Deep Symmetry, LLC (9M6LKU948Y)
+
+If you're curious, this seems to be why it won't work from the Finder:
+
+    > spctl --assess --type exec -vv Carabiner
+    Carabiner: rejected (the code is valid but does not seem to be an app)
+    origin=Developer ID Application: Deep Symmetry, LLC (9M6LKU948Y)
+
+So it's recognized as validly signed, but doesn't think it should be
+launchable because it's not an application bundle. That's true, it's a
+simple executable file, and the Finder is happy to use Terminal to
+launch those if they weren't downloaded, but not (so far) if they
+were. Hopefully a future macOS update will fix this.
+
+If you downloaded an unsigned or modified copy, not even Terminal will
+let you run it in Catalina, and will offer to move it to the trash for
+you. You can either replace it with a recent official signed release,
+build it from source yourself (as described below), or—if you want to
+live dangerously—search for instructions on how to work around this
+security feature.
 
 ## Clients
 

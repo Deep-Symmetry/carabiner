@@ -6,6 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## [1.1.3] - 2020-01-16
+
 ### Added
 
 - Now automatically build and release the Mac and Windows executables
@@ -13,6 +17,10 @@ This change log follows the conventions of
   of GitHub Actions.
 - Mac executables are released as code-signed, notarized disk images
   for ease of use on Catalina.
+
+### Changed
+
+- Updated to Link 3.0.2 and gflags 2.2.2.
 
 ## [1.1.2] - 2019-12-17
 
@@ -120,7 +128,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.2...HEAD
+[unreleased]: https://github.com/brunchboy/carabiner/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/brunchboy/carabiner/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/brunchboy/carabiner/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/brunchboy/carabiner/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/brunchboy/carabiner/compare/v1.0.0...v1.1.0
