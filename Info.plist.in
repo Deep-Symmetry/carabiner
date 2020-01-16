@@ -7,6 +7,6 @@
 	<key>CFBundleName</key>
 	<string>Carabiner</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.3</string>
+	<string>@Carabiner_VERSION@</string>
 </dict>
 </plist>
