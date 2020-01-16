@@ -33,6 +33,11 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     # Wrap the signed executable in a disk image
     hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin
 
+    # Also code sign the disk image?!
+    echo "Code signing the disk image."
+    codesign --verbose --deep --timestamp --options runtime --sign $mac_signing_name \
+             --prefix "org.deepsymmetry.Carabiner." $mac_dmg_name
+
     # Submit the disk image to Apple for notarization.
     echo "Sumbitting the disk image to Apple for notarization..."
     xcrun altool --notarize-app --primary-bundle-id "org.deepsymmetry.carabiner" \
