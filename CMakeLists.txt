@@ -20,9 +20,12 @@ add_executable(Carabiner
   carabiner.cpp
 )
 
+if (APPLE)
+   target_link_options(Carabiner PRIVATE LINKER:-sectcreate,__TEXT,__info_plist,${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
+endif()
+
 target_link_libraries(Carabiner Ableton::Link gflags)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(Carabiner pthread)
 endif()
-

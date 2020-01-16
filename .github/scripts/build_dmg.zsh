@@ -7,9 +7,6 @@ cd build
 cmake ..
 cmake --build .
 
-# Wrap the executable in a disk image
-hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin
-
 # See if the secrets needed to code-sign the disk image are present.
 if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
 
@@ -29,9 +26,12 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     # Set the keychain to allow use of the certificate without user interaction (we are headless!)
     security set-key-partition-list -S apple-tool:,apple: -s -k "$IDENTITY_PASSPHRASE" build.keychain
 
-    # Code sign the disk image.
-    echo "Code signing the disk image."
-    codesign --verbose --deep --timestamp --options runtime --sign $mac_signing_name $mac_dmg_name
+    # Code sign the binary.
+    echo "Code signing the executable."
+    codesign --verbose --timestamp --options runtime --sign $mac_signing_name bin/Carabiner
+
+    # Wrap the signed executable in a disk image
+    hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin
 
     # Submit the disk image to Apple for notarization.
     echo "Sumbitting the disk image to Apple for notarization..."
@@ -59,6 +59,9 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     else
         false;
     fi
+else
+    # No secrets, just wrap the unsigned executable in a disk image.
+    hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin
 fi
 
 # Move the disk image to where the upload task expects to find it.
