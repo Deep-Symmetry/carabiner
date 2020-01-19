@@ -7,6 +7,7 @@ on:
 
 env:
   windows_zip_name: 'Carabiner_Win_x64.zip'
+  linux_gz_name: 'Carabiner_Linux_x64.gz'
   mac_dmg_name: 'Carabiner_Mac.dmg'
   mac_signing_name: "Deep Symmetry, LLC (9M6LKU948Y)"
   mac_notarization_user: "james@deepsymmetry.org"
@@ -106,6 +107,55 @@ jobs:
 
           Please note that since it’s a snapshot release, the executables below (you may need to click to expand the Assets) will change frequently—whenever new code is pushed to the project—so you will want to _download the latest version every time you work with one_.
 
+
+  build_linux:
+    name: Build Linux x64 executable
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: Deep-Symmetry/github-version-action@v1
+      with:
+        tag-var-name: release_tag
+
+    - name: Determine snapshot status
+      run: |
+        if [[ $release_tag =~ .*-SNAPSHOT ]]
+        then
+          echo "::set-env name=release_snapshot::true"
+        else
+          echo "::set-env name=release_snapshot::false"
+        fi
+
+    - name: Compile and gzip executable
+      run: |
+        git submodule update --init --recursive
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+        cd bin
+        gzip Carabiner
+        mv Carabiner.gz ../../$linux_gz_name
+
+    - name: Upload Linux executable
+      if: success()
+      uses: brunchboy/cool-github-releases@initial-markdown-and-replace-assets
+      with:
+        mode: update
+        tag_name: ${{ env.release_tag }}
+        isPrerelease: true
+        replace_assets: ${{ env.release_snapshot }}
+        assets: ${{ env.linux_gz_name }}
+        github_token: ${{ github.token }}
+        initial_mrkdwn: |
+          :construction: This is pre-release code for people who want to help test [what is going into the next release](https://github.com/Deep-Symmetry/carabiner/blob/master/CHANGELOG.md).
+
+          > Don’t download this if you aren’t comfortable testing code while it is under active development! Instead, look at the [latest release](https:///github.com/Deep-Symmetry/carabiner/releases/latest).
+
+          Please note that since it’s a snapshot release, the executables below (you may need to click to expand the Assets) will change frequently—whenever new code is pushed to the project—so you will want to _download the latest version every time you work with one_.
 
   succeed_if_skipped:
     name: Skipping CI
