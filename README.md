@@ -31,7 +31,14 @@ Then just open a terminal window, and run it:
 
 By default it listens on port 17000. If this port is already in use on
 your system, you can specify a different port using the `--port`
-command-line argument.
+command-line argument. Legal port values are in the range 1–32776.
+
+Carabiner will send updates about changes to the Link session state no
+more often than every twenty milliseconds (or fifty times per second).
+If nothing is changing, no updates are sent. If you want to change the
+minimum interval between updates you can set a different millisecond
+interval using the `--poll` command-line argument. Legal poll values
+are in the range 1–1000.
 
 The status line shows the current tempo of the Link session, and the
 number of Link Peers which have been found. It also shows how many TCP
