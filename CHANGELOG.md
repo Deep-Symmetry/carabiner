@@ -6,7 +6,8 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+Nothing so far; there have been some improvements to the continuous
+deployment build process, but Carabiner itself is unchanged.
 
 ## [1.1.3] - 2020-01-16
 

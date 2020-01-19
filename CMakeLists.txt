@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(Carabiner)
 
-set(Carabiner_VERSION "1.1.3")
+set(Carabiner_VERSION "1.1.4-SNAPSHOT")
 configure_file(carabiner.h.in carabiner.h)
 configure_file(Info.plist.in Info.plist)
 
