@@ -46,7 +46,7 @@ jobs:
 
     - name: Upload Windows executable
       if: success()
-      uses: brunchboy/cool-github-releases@initial-markdown-and-replace-assets
+      uses: Xotl/cool-github-releases@v1
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
@@ -92,7 +92,7 @@ jobs:
 
     - name: Upload macOS disk image
       if: success()
-      uses: brunchboy/cool-github-releases@initial-markdown-and-replace-assets
+      uses: Xotl/cool-github-releases@v1
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
@@ -142,7 +142,7 @@ jobs:
 
     - name: Upload Linux executable
       if: success()
-      uses: brunchboy/cool-github-releases@initial-markdown-and-replace-assets
+      uses: Xotl/cool-github-releases@v1
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
@@ -156,12 +156,3 @@ jobs:
           > Don’t download this if you aren’t comfortable testing code while it is under active development! Instead, look at the [latest release](https:///github.com/Deep-Symmetry/carabiner/releases/latest).
 
           Please note that since it’s a snapshot release, the executables below (you may need to click to expand the Assets) will change frequently—whenever new code is pushed to the project—so you will want to _download the latest version every time you work with one_.
-
-  succeed_if_skipped:
-    name: Skipping CI
-    runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '[skip ci]')"
-
-    steps:
-    - name: Placate GitHub Actions
-      run: echo "CI skipped but want action to succeed anyway."
