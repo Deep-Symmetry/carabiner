@@ -20,10 +20,10 @@ not written using C++ compatible languages and runtimes.
 
 ## Usage
 
-If you are on a Mac OS X, Windows x64, or Raspberry Pi system,
-you can download the executable from the
-[releases](https://github.com/brunchboy/carabiner/releases) page.
-Then just open a terminal window, and run it:
+If you are on a Mac OS X, Windows x64, Linux x64, or Raspberry Pi
+system, you can download the executable from the
+[releases](https://github.com/brunchboy/carabiner/releases) page. Then
+just open a terminal window, and run it:
 
     > Carabiner
     Starting Carabiner 1.1.2 on port tcp://127.0.0.1:17000
@@ -55,7 +55,7 @@ window, or simply closing that window.
 > it does not spam the system log with status line updates that you
 > can't see anyway.
 
-## Running on the Mac
+### Running on the Mac
 
 You will need to open the Terminal window yourself and run Carabiner
 by typing the path to the program. Previously you could run programs
@@ -103,6 +103,24 @@ security feature.
 * [link-to-py](https://github.com/bdyetton/link-to-py) is a Python 3
   module for interacting with Carabiner written
   by [Benjamin Yetton](https://github.com/bdyetton).
+* [beat-carabiner](https://github.com/Deep-Symmetry/beat-carabiner) is
+  a Clojure library for interacting with Carabiner and integrating it
+  into a Pioneer DJ Link network.
+
+## Embedding
+
+* [lib-carabiner](https://github.com/Deep-Symmetry/lib-carabiner) is a
+  Java library that embeds copies of Carabiner for all supported
+  platforms, offering a very simple API that can automatically install
+  the appropriate binary for the current operating system and
+  processor architecture as a temporary file, and start or stop it on
+  demand.
+
+> If you know of any other clients or embedding libraries, please open
+> an [issue](https://github.com/Deep-Symmetry/carabiner/issues) or
+> mention them on [Beat Link Trigger's Gitter
+> channel](https://gitter.im/brunchboy/beat-link-trigger) so I can add
+> links here.
 
 ## Building
 
