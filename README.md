@@ -190,9 +190,22 @@ the current status. It will respond with a packet like the following:
 As with all non-error messages from Carabiner, this consists of a
 message type identifier followed by an
 [edn](https://github.com/edn-format/edn#edn) structure containing the
-message parameters. In this case, it identifies the current number of
-Link peers, the current tempo of the Link session, the timestamp
-of when the session timeline started, and the current beat position.
+message parameters.
+
+> :wrench: If you are working in Clojure, you can take advantage of
+> its built-in support for edn. If you are working in Java, you will
+> likely want to consider using
+> [lib-carabiner](https://github.com/Deep-Symmetry/lib-carabiner) both
+> for its ability to embed and manage Carabiner itself, and also
+> because it can parse these responses for you. Or you could use
+> [edn-java](https://github.com/bpsm/edn-java#edn-java), directly,
+> it's what lib-carabiner uses. And there are many [other
+> implementations](https://github.com/edn-format/edn/wiki/Implementations)
+> for other languages.
+
+In this case, the message details map identifies the current number of
+Link peers, the current tempo of the Link session, the timestamp of
+when the session timeline started, and the current beat position.
 
 If you have enabled Start/Stop Sync, status responses will also
 include the current transport state:
