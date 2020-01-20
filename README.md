@@ -198,7 +198,7 @@ message parameters.
 > [lib-carabiner](https://github.com/Deep-Symmetry/lib-carabiner) both
 > for its ability to embed and manage Carabiner itself, and also
 > because it can parse these responses for you. Or you could use
-> [edn-java](https://github.com/bpsm/edn-java#edn-java), directly,
+> [edn-java](https://github.com/bpsm/edn-java#edn-java) directly,
 > it's what lib-carabiner uses. And there are many [other
 > implementations](https://github.com/edn-format/edn/wiki/Implementations)
 > for other languages.
