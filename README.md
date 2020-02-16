@@ -228,6 +228,15 @@ Start/Stop Sync) when the transport state changes.
 > `System.nanoTime()` method. If you are working in other languages,
 > you will need to experiment in order to find out how to read the
 > same clock that Link is using.
+>
+> :heavy_exclamation_mark: This also means that Carabiner needs to
+> be running on the same host (computer) as your other software that
+> is using Carabiner to synchronize with the Link network. Link
+> itself will handle distributed synchronization across the network,
+> but Carabinber and the clients you write to talk to Carabiner need
+> to share the exact same time base, so they need to be on the same
+> machine. This is why Carabiner only accepts connections on the
+> loopback address (127.0.0.1).
 
 ### bpm
 
