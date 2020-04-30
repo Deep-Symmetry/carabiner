@@ -6,8 +6,12 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far; there have been some improvements to the continuous
-deployment build process, but Carabiner itself is unchanged.
+### Changed
+
+- The macOS build process now creates HFS+ (MacOS Extended) disk
+  images rather than the default APFS filesystem that it was
+  previously using. This allows them to be opened on High Sierra
+  (10.12) and earlier.
 
 ## [1.1.3] - 2020-01-16
 
