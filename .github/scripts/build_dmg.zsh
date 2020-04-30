@@ -31,7 +31,7 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     codesign --verbose --timestamp --options runtime --sign $mac_signing_name bin/Carabiner
 
     # Wrap the signed executable in a disk image
-    hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin
+    hdiutil create $mac_dmg_name -fs HFS+ -volname 'Carabiner' -srcfolder bin
 
     # Also code sign the disk image?!
     echo "Code signing the disk image."
