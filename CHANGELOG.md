@@ -12,6 +12,10 @@ This change log follows the conventions of
   images rather than the default APFS filesystem that it was
   previously using. This allows them to be opened on High Sierra
   (10.12) and earlier.
+- The build configuration now specifies that the macOS version should
+  be compiled in a way that is backwards-compatible as far back as
+  macOS 10.12, which should hopefully fix linker errors people were
+  seeing on macOS 10.13 (issue #18).
 
 ## [1.1.3] - 2020-01-16
 
