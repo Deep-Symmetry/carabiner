@@ -6,6 +6,10 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+## [1.1.4] - 2020-07-01
+
 ### Changed
 
 - The macOS build process now creates HFS+ (MacOS Extended) disk
@@ -137,7 +141,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.3...HEAD
+[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.4...HEAD
+[1.1.4]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.0...v1.1.1
