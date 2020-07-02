@@ -20,6 +20,7 @@ Nothing so far.
   be compiled in a way that is backwards-compatible as far back as
   macOS 10.12, which should hopefully fix linker errors people were
   seeing on macOS 10.13 (issue #18).
+- Updated the Ableton Link and gflags libraries.
 
 ## [1.1.3] - 2020-01-16
 
