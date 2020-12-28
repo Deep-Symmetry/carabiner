@@ -10,6 +10,8 @@ Nothing so far.
 
 ## [1.1.5] - 2020-12-28
 
+### Changed
+
 - Updated Ableton Link to release 3.0.3.
 - Updated gflags to release 2.2.2.
 - Fixed Github Actions build script.

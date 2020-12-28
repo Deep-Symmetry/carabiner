@@ -4,7 +4,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ve
 
 project(Carabiner)
 
-set(Carabiner_VERSION "1.1.5")
+set(Carabiner_VERSION "1.1.6-SNAPSHOT")
 configure_file(carabiner.h.in carabiner.h)
 configure_file(Info.plist.in Info.plist)
 
