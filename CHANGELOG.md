@@ -8,6 +8,12 @@ This change log follows the conventions of
 
 Nothing so far.
 
+## [1.1.5] - 2020-12-28
+
+- Updated Ableton Link to release 3.0.3.
+- Updated gflags to release 2.2.2.
+- Fixed Github Actions build script.
+
 ## [1.1.4] - 2020-07-01
 
 ### Changed
@@ -142,7 +148,8 @@ Nothing so far.
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.4...HEAD
+[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.5...HEAD
+[1.1.5]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.1...v1.1.2
