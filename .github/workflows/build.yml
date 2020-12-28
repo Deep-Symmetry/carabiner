@@ -35,9 +35,9 @@ jobs:
     - name: Determine snapshot status
       run: |
         If ($env:release_tag -like '*-SNAPSHOT') {
-          echo "::set-env name=release_snapshot::true"
+          echo "release_snapshot=true" >> $GITHUB_ENV
         } Else {
-          echo "::set-env name=release_snapshot::false"
+          echo "release_snapshot=false" >> $GITHUB_ENV
         }
 
     - name: Compile and zip executable
@@ -80,9 +80,9 @@ jobs:
       run: |
         if [[ $release_tag =~ .*-SNAPSHOT ]]
         then
-          echo "::set-env name=release_snapshot::true"
+          echo "release_snapshot=true" >> $GITHUB_ENV
         else
-          echo "::set-env name=release_snapshot::false"
+          echo "release_snapshot=false" >> $GITHUB_ENV
         fi
 
     - name: Build, sign, and notarize macOS disk image
@@ -121,9 +121,9 @@ jobs:
       run: |
         if [[ $release_tag =~ .*-SNAPSHOT ]]
         then
-          echo "::set-env name=release_snapshot::true"
+          echo "release_snapshot=true" >> $GITHUB_ENV
         else
-          echo "::set-env name=release_snapshot::false"
+          echo "release_snapshot=false" >> $GITHUB_ENV
         fi
 
     - name: Compile and gzip executable
@@ -143,7 +143,7 @@ jobs:
       with:
         mode: update
         tag_name: ${{ env.release_tag }}
-        isPrerelease: true
+        isPrerelease: ${{ env.release_snapshot }}
         replace_assets: ${{ env.release_snapshot }}
         assets: ${{ env.linux_gz_name }}
         github_token: ${{ github.token }}
