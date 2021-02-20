@@ -6,6 +6,11 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+
+## [1.1.6] - 2021-02-20
+
 ### Added
 
 - The macOS binary is now compiled as a universal binary to include
@@ -156,7 +161,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.5...HEAD
+[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.6...HEAD
+[1.1.6]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.2...v1.1.3

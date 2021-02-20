@@ -118,8 +118,8 @@ security feature.
 
 > If you know of any other clients or embedding libraries, please open
 > an [issue](https://github.com/Deep-Symmetry/carabiner/issues) or
-> mention them on [Beat Link Trigger's Gitter
-> channel](https://gitter.im/brunchboy/beat-link-trigger) so I can add
+> mention them on [Carabiner's Zulip
+> stream]https://deep-symmetry.zulipchat.com/join/wdwsoeiv54bz3coshgjomaqy/)
 > links here.
 
 ## Building
@@ -480,7 +480,7 @@ definitely welcome!
 
 <img align="right" alt="Deep Symmetry" src="doc/assets/DS-logo-bw-200-padded-left.png">
 
-Carabiner is Copyright © 2016-2020 [Deep Symmetry, LLC](http://deepsymmetry.org)
+Carabiner is Copyright © 2016-2021 [Deep Symmetry, LLC](http://deepsymmetry.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
