@@ -119,7 +119,7 @@ security feature.
 > If you know of any other clients or embedding libraries, please open
 > an [issue](https://github.com/Deep-Symmetry/carabiner/issues) or
 > mention them on [Carabiner's Zulip
-> stream]https://deep-symmetry.zulipchat.com/join/wdwsoeiv54bz3coshgjomaqy/)
+> stream](https://deep-symmetry.zulipchat.com/join/wdwsoeiv54bz3coshgjomaqy/)
 > links here.
 
 ## Building
