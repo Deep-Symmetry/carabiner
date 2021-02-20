@@ -7,6 +7,12 @@ cd build
 cmake ..
 cmake --build .
 
+# Probe what actually got built
+echo "Build probe:"
+sw_vers
+uname -m
+file bin/Carabiner
+
 # See if the secrets needed to code-sign the disk image are present.
 if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
 
