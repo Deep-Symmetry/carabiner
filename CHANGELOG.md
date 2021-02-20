@@ -6,7 +6,13 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far.
+### Added
+
+- The macOS binary is now compiled as a universal binary to include
+  code for both x86_64 (Intel) and arm64 (Apple Silicon). This means
+  that Xcode 12 is required for building, and therefore Catalina
+  (macOS 10.15) is the minimum macOS version on which it can be built.
+  The binary will still run on macOS versions back to Sierra (10.12).
 
 ## [1.1.5] - 2020-12-28
 

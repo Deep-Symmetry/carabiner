@@ -127,6 +127,14 @@ security feature.
 If you want to run Carabiner on a different platform, or make and test
 modifications to its source code, you can build it yourself.
 
+> :wrench: As noted in the [change log](CHANGELOG.md), starting with
+> version 1.1.6, building on macOS now requires Xcode 12 and therefore
+> macOS 10.15 (Catalina) in order to support building universal
+> binaries for both Intel and Apple Silicon machines. As always, in
+> addition to installing the Xcode GUI application, you need to
+> install the command-line tools, using `xcode-select --install`
+> before you can use these build instructions.
+
 Carabiner relies on `link` and `gflags` as `git` submodules (and link
 relies on its own submodules), so after you have cloned the main
 `carabiner` repository, you need to `cd` into it and set up the
