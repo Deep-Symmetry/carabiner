@@ -35,9 +35,9 @@ jobs:
     - name: Determine snapshot status
       run: |
         If ($env:release_tag -like '*-SNAPSHOT') {
-          echo "release_snapshot=true" >> $GITHUB_ENV
+          echo "release_snapshot=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         } Else {
-          echo "release_snapshot=false" >> $GITHUB_ENV
+          echo "release_snapshot=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         }
 
     - name: Compile and zip executable
