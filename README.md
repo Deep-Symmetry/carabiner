@@ -5,6 +5,8 @@
 A loose connector for interacting with
 [Ableton Link](https://www.ableton.com/en/link/).
 
+[![License](https://img.shields.io/github/license/Deep-Symmetry/carabiner?color=blue)](#license)
+
 Carabiner is a program that embeds the C++
 [Link library](https://github.com/Ableton/link) and listens for local
 TCP connections to allow other programs, like
@@ -477,9 +479,10 @@ definitely welcome!
 
 ## Licenses
 
-<img align="right" alt="Deep Symmetry" src="doc/assets/DS-logo-bw-200-padded-left.png">
+<a href="http://deepsymmetry.org"><img align="right" alt="Deep Symmetry"
+ src="doc/assets/DS-logo-github.png" width="250" height="150"></a>
 
-Carabiner is Copyright © 2016-2021 [Deep Symmetry, LLC](http://deepsymmetry.org)
+Carabiner is Copyright © 2016-2022 [Deep Symmetry, LLC](http://deepsymmetry.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
