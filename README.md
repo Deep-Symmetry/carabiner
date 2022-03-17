@@ -7,7 +7,7 @@
 A loose connector for interacting with
 [Ableton Link](https://www.ableton.com/en/link/).
 
-[![License](https://img.shields.io/badge/Licence-GPL%20v2-blue.svg)](#licenses)
+[![License](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](#licenses)
 
 Carabiner is a program that embeds the C++
 [Link library](https://github.com/Ableton/link) and listens for local
