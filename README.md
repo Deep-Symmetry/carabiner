@@ -2,10 +2,12 @@
 
 <image align="right" width="150" src="doc/assets/carabiner.jpg">
 
+[![project chat](https://img.shields.io/badge/chat-on%20zulip-brightgreen)](https://deep-symmetry.zulipchat.com/#narrow/stream/278354-carabiner)
+
 A loose connector for interacting with
 [Ableton Link](https://www.ableton.com/en/link/).
 
-[![License](https://img.shields.io/github/license/Deep-Symmetry/carabiner?color=blue)](#license)
+[![License](https://img.shields.io/github/license/Deep-Symmetry/carabiner?color=blue)](#licenses)
 
 Carabiner is a program that embeds the C++
 [Link library](https://github.com/Ableton/link) and listens for local
@@ -121,7 +123,7 @@ security feature.
 > If you know of any other clients or embedding libraries, please open
 > an [issue](https://github.com/Deep-Symmetry/carabiner/issues) or
 > mention them on [Carabiner's Zulip
-> stream](https://deep-symmetry.zulipchat.com/join/wdwsoeiv54bz3coshgjomaqy/).
+> stream](https://deep-symmetry.zulipchat.com/#narrow/stream/278354-carabiner).
 
 ## Building
 
@@ -487,7 +489,7 @@ Carabiner is Copyright © 2016-2022 [Deep Symmetry, LLC](http://deepsymmetry.org
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either
-[version 2 of the License](LICENSE.md), or (at your option) any later
+[version 2 of the License](LICENSE), or (at your option) any later
 version.
 
 This program is distributed in the hope that it will be useful, but
