@@ -22,6 +22,19 @@ not written using C++ compatible languages and runtimes.
 > are much better off doing that instead. Carabiner is for cases where
 > that is impossible or impractical.
 
+## Getting Help
+
+<a href="http://zulip.com"><img align="right" alt="Zulip logo"
+ src="doc/assets/zulip-icon-circle.svg" width="128" height="128"></a>
+
+Deep Symmetry&rsquo;s projects are generously sponsored with hosting
+by <a href="https://zulip.com">Zulip</a>, an open-source modern team
+chat app designed to keep both live and asynchronous conversations
+organized. Thanks to them, you can <a
+href="https://deep-symmetry.zulipchat.com/#narrow/stream/278354-carabiner">chat
+with our community</a>, ask questions, get inspiration, and share your
+own ideas.
+
 ## Usage
 
 If you are on a Mac OS X, Windows x64, Linux x64, or Raspberry Pi
@@ -57,17 +70,17 @@ window, or simply closing that window.
 > background process that starts when the system boots), add
 > `--daemon` to the command line you configure to start it up, so that
 > it does not spam the system log with status line updates that you
-> can't see anyway.
+> can&rsquo;t see anyway.
 
 ### Running on the Mac
 
 You will need to open the Terminal window yourself and run Carabiner
 by typing the path to the program. Previously you could run programs
 like this by double-clicking them in the Finder, but an issue with the
-Mac's download security model prevents that today. It will still work
+Mac&rsquo;s download security model prevents that today. It will still work
 if you built it from source, but if you downloaded it, you will see a
 complaint about being unable to confirm the identity of the developer.
-That's not actually true: if you downloaded it from the project's
+That&rsquo;s not actually true: if you downloaded it from the project&rsquo;s
 Releases page on GitHub, it has been properly code-signed and
 notarized by Deep Symmetry, but that is only honored when you run it
 from an already-open terminal window. You can confirm the signature,
@@ -83,17 +96,18 @@ When your copy is properly signed you will see this output:
     source=Notarized Developer ID
     origin=Developer ID Application: Deep Symmetry, LLC (9M6LKU948Y)
 
-If you're curious, this seems to be why it won't work from the Finder:
+If you&rsquo;re curious, this seems to be why it won&rsquo;t work from the Finder:
 
     > spctl --assess --type exec -vv Carabiner
     Carabiner: rejected (the code is valid but does not seem to be an app)
     origin=Developer ID Application: Deep Symmetry, LLC (9M6LKU948Y)
 
-So it's recognized as validly signed, but doesn't think it should be
-launchable because it's not an application bundle. That's true, it's a
+So it&rsquo;s recognized as validly signed, but doesn&rsquo;t think it should be
+launchable because it&rsquo;s not an application bundle. That&rsquo;s true, it&rsquo;s a
 simple executable file, and the Finder is happy to use Terminal to
-launch those if they weren't downloaded, but not (so far) if they
-were. Hopefully a future macOS update will fix this.
+launch those if they weren&rsquo;t downloaded, but not (so far) if they
+were. We hoped a future macOS update would fix this, but since it&rsquo;s
+still true in Ventura, we&rsquo;re not holding our breath.
 
 If you downloaded an unsigned or modified copy, not even Terminal will
 let you run it in Catalina, and will offer to move it to the trash for
@@ -122,7 +136,7 @@ security feature.
 
 > If you know of any other clients or embedding libraries, please open
 > an [issue](https://github.com/Deep-Symmetry/carabiner/issues) or
-> mention them on [Carabiner's Zulip
+> mention them on [Carabiner&rsquo;s Zulip
 > stream](https://deep-symmetry.zulipchat.com/#narrow/stream/278354-carabiner).
 
 ## Building
@@ -210,7 +224,7 @@ message parameters.
 > for its ability to embed and manage Carabiner itself, and also
 > because it can parse these responses for you. Or you could use
 > [edn-java](https://github.com/bpsm/edn-java#edn-java) directly,
-> it's what lib-carabiner uses. And there are many [other
+> it&rsquo;s what lib-carabiner uses. And there are many [other
 > implementations](https://github.com/edn-format/edn/wiki/Implementations)
 > for other languages.
 
@@ -253,7 +267,7 @@ Start/Stop Sync) when the transport state changes.
 
 Sending the string `bpm ` followed by a floating-point value, for
 example `bpm 140.0`, tells Carabiner to immediately set the Link
-session's tempo to the specified value. If this is a change from the
+session&rsquo;s tempo to the specified value. If this is a change from the
 previous value, it will result in a `status` response as described
 above.
 
@@ -466,7 +480,7 @@ transport state.
 Sending the string `version` asks Carabiner to report its version
 number. This is only supported starting with verson 1.1.0; previous
 versions will respond `unsupported version` (which sounds pretty
-on-point, but really means that they don't know about the `version`
+on-point, but really means that they don&rsquo;t know about the `version`
 command), so you can assume that they are version 1.0.0 or earlier.
 Supported versions respond with `version` followed by the version
 string, for example `version "1.1.0"`.
@@ -484,7 +498,7 @@ definitely welcome!
 <a href="http://deepsymmetry.org"><img align="right" alt="Deep Symmetry"
  src="doc/assets/DS-logo-github.png" width="250" height="150"></a>
 
-Carabiner is Copyright © 2016-2022 [Deep Symmetry, LLC](http://deepsymmetry.org)
+Carabiner is Copyright © 2016-2023 [Deep Symmetry, LLC](http://deepsymmetry.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
