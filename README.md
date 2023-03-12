@@ -1,6 +1,6 @@
 # Carabiner
 
-<image align="right" width="150" src="doc/assets/carabiner.jpg">
+<image align="right" width="150" src="doc/assets/carabiner.png">
 
 [![project chat](https://img.shields.io/badge/chat-on%20zulip-brightgreen)](https://deep-symmetry.zulipchat.com/#narrow/stream/278354-carabiner)
 
