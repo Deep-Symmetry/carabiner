@@ -1,3 +1,6 @@
+# Fail if any step fails
+set -e
+
 # Initialize our nested projects.
 git submodule update --init --recursive
 
@@ -40,30 +43,13 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
 
     # Submit the disk image to Apple for notarization.
     echo "Sumbitting the disk image to Apple for notarization..."
-    xcrun altool --notarize-app --primary-bundle-id "org.deepsymmetry.carabiner" \
-          --username "$mac_notarization_user" --password "$NOTARIZATION_PW" \
-          --file "$mac_dmg_name" --output-format xml > upload_result.plist
-    request_id=`/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" upload_result.plist`
+    xcrun notarytool submit --apple-id "$mac_notarization_user" --password "$NOTARIZATION_PW" \
+          --team-id "$mac_team_id" "$mac_dmg_name" --wait
 
-    # Wait until the request is done processing.
-    while true; do
-        sleep 60
-        xcrun altool --notarization-info $request_id \
-              --username "$mac_notarization_user" --password "$NOTARIZATION_PW" \
-              --output-format xml > status.plist
-        if [ "`/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" status.plist`" != "in progress" ]; then
-            break;
-        fi
-        echo "...still waiting for notarization to finish..."
-    done
+    # Staple the notarization ticket to the disk image.
+    echo "Notarization succeeded, stapling receipt to disk image."
+    xcrun stapler staple "$mac_dmg_name"
 
-    # See if notarization succeeded, and if so, staple the ticket to the disk image.
-    if [ `/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" status.plist` = "success" ]; then
-        echo "Notarization succeeded, stapling receipt to disk image."
-        xcrun stapler staple "$mac_dmg_name"
-    else
-        false;
-    fi
 else
     # No secrets, just wrap the unsigned executable in a disk image.
     hdiutil create $mac_dmg_name -volname 'Carabiner' -srcfolder bin

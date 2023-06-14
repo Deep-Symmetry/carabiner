@@ -10,6 +10,7 @@ env:
   linux_gz_name: 'Carabiner_Linux_x64.gz'
   mac_dmg_name: 'Carabiner_Mac.dmg'
   mac_signing_name: "Deep Symmetry, LLC (9M6LKU948Y)"
+  mac_team_id: "9M6LKU948Y"
   mac_notarization_user: "james@deepsymmetry.org"
   initial_description: |
     :construction: This is pre-release code for people who want to help test [what is going into the next release](https://github.com/Deep-Symmetry/carabiner/blob/master/CHANGELOG.md).
