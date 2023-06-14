@@ -3,7 +3,7 @@ name: Create executables
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   windows_zip_name: 'Carabiner_Win_x64.zip'
