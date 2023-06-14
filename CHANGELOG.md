@@ -6,8 +6,11 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
-Nothing so far. (Continuous Integration has been updated to move away
-from a deprecated Apple notarization tool.)
+### Changed
+
+- Updated Ableton Link to release 3.0.6.
+- Continuous Integration has been updated to move away from a
+  deprecated Apple notarization tool.
 
 
 ## [1.1.6] - 2021-02-20
