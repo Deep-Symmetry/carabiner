@@ -46,7 +46,7 @@ jobs:
         git submodule update --init --recursive
         mkdir build
         cd build
-        cmake -g "Visual Studio 15 2017" ..
+        cmake -G "Visual Studio 16 2019" ..
         cmake --build . --config Release
         cd bin\Release
         7z a $env:windows_zip_name Carabiner.exe
