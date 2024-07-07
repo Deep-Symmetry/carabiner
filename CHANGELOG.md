@@ -6,6 +6,11 @@ This change log follows the conventions of
 
 ## [Unreleased][unreleased]
 
+Nothing so far.
+
+
+## [1.2.0] - 2024-07-07
+
 ### Changed
 
 - Updated Ableton Link to release 3.1.2.
@@ -165,7 +170,8 @@ This change log follows the conventions of
 - Chose communication and configuration frameworks.
 - Built an implementation which meets the needs of beat-link-trigger.
 
-[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.6...HEAD
+[unreleased]: https://github.com/Deep-Symmetry/carabiner/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.6...v1.2.0
 [1.1.6]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/Deep-Symmetry/carabiner/compare/v1.1.3...v1.1.4
