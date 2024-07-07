@@ -20,10 +20,14 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     security unlock-keychain -p "$IDENTITY_PASSPHRASE" build.keychain
 
     # Put the base-64 encoded signing certificicate into a text file, decode it to binary form.
+    echo "Decoding signing certificate to binary format"
     echo "$IDENTITY_P12_B64" > DS_ID_App.p12.txt
     openssl base64 -d -in DS_ID_App.p12.txt -out DS_ID_App.p12
+    ls -l DS_ID_App.p12
+    file DS_ID_App.p12
 
     # Install the decoded signing certificate into our unlocked build keychain.
+    echo "Importing signing certificate into keychain"
     security import DS_ID_App.p12 -A -P "$IDENTITY_PASSPHRASE"
 
     # Set the keychain to allow use of the certificate without user interaction (we are headless!)
