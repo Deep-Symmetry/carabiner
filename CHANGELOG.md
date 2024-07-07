@@ -8,7 +8,7 @@ This change log follows the conventions of
 
 ### Changed
 
-- Updated Ableton Link to release 3.0.6.
+- Updated Ableton Link to release 3.1.2.
 - Continuous Integration has been updated to move away from a
   deprecated Apple notarization tool.
 

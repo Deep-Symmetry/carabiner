@@ -5,7 +5,7 @@ set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build universal binary"
 
 project(Carabiner)
 
-set(Carabiner_VERSION "1.1.6")
+set(Carabiner_VERSION "1.2.0")
 configure_file(carabiner.h.in carabiner.h)
 configure_file(Info.plist.in Info.plist)
 
