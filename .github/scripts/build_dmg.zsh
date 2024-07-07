@@ -29,6 +29,10 @@ if  [ "$IDENTITY_PASSPHRASE" != "" ]; then
     # Set the keychain to allow use of the certificate without user interaction (we are headless!)
     security set-key-partition-list -S apple-tool:,apple: -s -k "$IDENTITY_PASSPHRASE" build.keychain
 
+    # Try to debug code signing environment
+    echo "Checking code signing identities"
+    security find-identity -p codesigning
+
     # Code sign the binary.
     echo "Code signing the executable."
     codesign --verbose --timestamp --options runtime --sign $mac_signing_name bin/Carabiner
