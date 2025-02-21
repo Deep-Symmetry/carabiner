@@ -6,8 +6,9 @@ on:
       - main
 
 env:
+  linux_arm_gz_name: 'Carabiner_Linux_arm.gz'
+  linux_x64_gz_name: 'Carabiner_Linux_x64.gz'
   windows_zip_name: 'Carabiner_Win_x64.zip'
-  linux_gz_name: 'Carabiner_Linux_x64.gz'
   mac_dmg_name: 'Carabiner_Mac.dmg'
   mac_signing_name: "Deep Symmetry, LLC (9M6LKU948Y)"
   mac_team_id: "9M6LKU948Y"
@@ -106,7 +107,52 @@ jobs:
         initial_mrkdwn: ${{ env.initial_description }}
 
 
-  build_linux:
+  build_linux_arm:
+    name: Build Linux ARM executable
+    runs-on: ubuntu--24.04-arm
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: Deep-Symmetry/github-version-action@v1
+      with:
+        tag-var-name: release_tag
+
+    - name: Determine snapshot status
+      run: |
+        if [[ $release_tag =~ .*-SNAPSHOT ]]
+        then
+          echo "release_snapshot=true" >> $GITHUB_ENV
+        else
+          echo "release_snapshot=false" >> $GITHUB_ENV
+        fi
+
+    - name: Compile and gzip executable
+      run: |
+        git submodule update --init --recursive
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+        cd bin
+        gzip Carabiner
+        mv Carabiner.gz ../../$linux_arm_gz_name
+
+    - name: Upload Linux ARM executable
+      if: success()
+      uses: Xotl/cool-github-releases@v1
+      with:
+        mode: update
+        tag_name: ${{ env.release_tag }}
+        isPrerelease: ${{ env.release_snapshot }}
+        replace_assets: ${{ env.release_snapshot }}
+        assets: ${{ env.linux_arm_gz_name }}
+        github_token: ${{ github.token }}
+        initial_mrkdwn: ${{ env.initial_description }}
+
+
+  build_linux_x64:
     name: Build Linux x64 executable
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
@@ -136,9 +182,9 @@ jobs:
         cmake --build .
         cd bin
         gzip Carabiner
-        mv Carabiner.gz ../../$linux_gz_name
+        mv Carabiner.gz ../../$linux_x64_gz_name
 
-    - name: Upload Linux executable
+    - name: Upload Linux x64 executable
       if: success()
       uses: Xotl/cool-github-releases@v1
       with:
@@ -146,6 +192,6 @@ jobs:
         tag_name: ${{ env.release_tag }}
         isPrerelease: ${{ env.release_snapshot }}
         replace_assets: ${{ env.release_snapshot }}
-        assets: ${{ env.linux_gz_name }}
+        assets: ${{ env.linux_x64_gz_name }}
         github_token: ${{ github.token }}
         initial_mrkdwn: ${{ env.initial_description }}
